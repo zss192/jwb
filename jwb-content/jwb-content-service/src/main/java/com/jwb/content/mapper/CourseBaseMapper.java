@@ -9,6 +9,7 @@ import com.jwb.model.po.CourseBase;
  * @createDate 2024-06-11 15:29:16
  * @Entity generator.domain.CourseBase
  */
+
 public interface CourseBaseMapper extends BaseMapper<CourseBase> {
 
 }

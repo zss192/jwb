@@ -1,8 +1,8 @@
 package com.jwb.content.service.impl;
 
 import com.jwb.content.mapper.CourseCategoryMapper;
+import com.jwb.content.model.dto.CourseCategoryTreeDto;
 import com.jwb.content.service.CourseCategoryService;
-import com.jwb.model.dto.CourseCategoryTreeDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

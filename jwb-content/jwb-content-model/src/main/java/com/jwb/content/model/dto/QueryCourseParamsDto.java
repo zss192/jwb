@@ -1,4 +1,4 @@
-package com.jwb.model.dto;
+package com.jwb.content.model.dto;
 
 import lombok.Data;
 import lombok.ToString;

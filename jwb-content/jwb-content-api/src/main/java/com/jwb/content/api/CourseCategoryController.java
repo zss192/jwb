@@ -1,7 +1,7 @@
 package com.jwb.content.api;
 
+import com.jwb.content.model.dto.CourseCategoryTreeDto;
 import com.jwb.content.service.CourseCategoryService;
-import com.jwb.model.dto.CourseCategoryTreeDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

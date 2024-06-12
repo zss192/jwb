@@ -1,16 +1,16 @@
-package com.jwb.model.po;
+package com.jwb.content.model.po;
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 课程发布(CoursePublishPre)实体类
+ * 课程发布(CoursePublish)实体类
  *
  * @author makejava
  * @since 2024-06-10 18:41:30
  */
-public class CoursePublishPre implements Serializable {
-    private static final long serialVersionUID = 900219079772191999L;
+public class CoursePublish implements Serializable {
+    private static final long serialVersionUID = -68478596995011582L;
     /**
      * 主键
      */
@@ -84,15 +84,19 @@ public class CoursePublishPre implements Serializable {
      */
     private String teachers;
     /**
-     * 提交时间
+     * 发布时间
      */
     private Date createDate;
     /**
-     * 审核时间
+     * 上架时间
      */
-    private Date auditDate;
+    private Date onlineDate;
     /**
-     * 状态
+     * 下架时间
+     */
+    private Date offlineDate;
+    /**
+     * 发布状态
      */
     private String status;
     /**
@@ -269,12 +273,20 @@ public class CoursePublishPre implements Serializable {
         this.createDate = createDate;
     }
 
-    public Date getAuditDate() {
-        return auditDate;
+    public Date getOnlineDate() {
+        return onlineDate;
     }
 
-    public void setAuditDate(Date auditDate) {
-        this.auditDate = auditDate;
+    public void setOnlineDate(Date onlineDate) {
+        this.onlineDate = onlineDate;
+    }
+
+    public Date getOfflineDate() {
+        return offlineDate;
+    }
+
+    public void setOfflineDate(Date offlineDate) {
+        this.offlineDate = offlineDate;
     }
 
     public String getStatus() {

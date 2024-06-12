@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jwb.content.mapper.CourseCategoryMapper">
 
-    <resultMap id="BaseResultMap" type="com.jwb.model.po.CourseCategory">
+    <resultMap id="BaseResultMap" type="com.jwb.content.model.po.CourseCategory">
         <id property="id" column="id" jdbcType="VARCHAR"/>
         <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="label" column="label" jdbcType="VARCHAR"/>
@@ -14,7 +14,7 @@
         <result property="isLeaf" column="is_leaf" jdbcType="TINYINT"/>
     </resultMap>
 
-    <select id="selectTreeNodes" parameterType="string" resultType="com.jwb.model.dto.CourseCategoryTreeDto">
+    <select id="selectTreeNodes" parameterType="string" resultType="com.jwb.content.model.dto.CourseCategoryTreeDto">
         with recursive t1 as (select *
                               from course_category
                               where id = #{id}

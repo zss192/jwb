@@ -1,6 +1,6 @@
 package com.jwb.content.service;
 
-import com.jwb.model.dto.CourseCategoryTreeDto;
+import com.jwb.content.model.dto.CourseCategoryTreeDto;
 
 import java.util.List;
 

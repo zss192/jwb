@@ -1,7 +1,7 @@
 package com.jwb.content.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jwb.model.po.CourseBase;
+import com.jwb.content.model.po.CourseBase;
 
 /**
  * @author zss

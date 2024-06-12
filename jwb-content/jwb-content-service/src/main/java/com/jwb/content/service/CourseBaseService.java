@@ -2,8 +2,8 @@ package com.jwb.content.service;
 
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
-import com.jwb.model.dto.QueryCourseParamsDto;
-import com.jwb.model.po.CourseBase;
+import com.jwb.content.model.dto.QueryCourseParamsDto;
+import com.jwb.content.model.po.CourseBase;
 
 /**
  * @author zss

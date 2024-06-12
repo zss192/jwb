@@ -2,9 +2,9 @@ package com.jwb.content.api;
 
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
+import com.jwb.content.model.dto.QueryCourseParamsDto;
+import com.jwb.content.model.po.CourseBase;
 import com.jwb.content.service.CourseBaseService;
-import com.jwb.model.dto.QueryCourseParamsDto;
-import com.jwb.model.po.CourseBase;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,8 @@
 package com.jwb.content.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jwb.model.dto.CourseCategoryTreeDto;
-import com.jwb.model.po.CourseCategory;
+import com.jwb.content.model.dto.CourseCategoryTreeDto;
+import com.jwb.content.model.po.CourseCategory;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

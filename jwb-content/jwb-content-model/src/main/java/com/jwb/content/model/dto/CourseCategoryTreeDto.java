@@ -1,6 +1,6 @@
-package com.jwb.model.dto;
+package com.jwb.content.model.dto;
 
-import com.jwb.model.po.CourseCategory;
+import com.jwb.content.model.po.CourseCategory;
 import lombok.Data;
 
 import java.io.Serializable;

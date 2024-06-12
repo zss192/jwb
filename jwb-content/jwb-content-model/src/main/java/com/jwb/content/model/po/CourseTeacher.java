@@ -1,4 +1,4 @@
-package com.jwb.model.po;
+package com.jwb.content.model.po;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jwb.content.mapper.CourseBaseMapper">
 
-    <resultMap id="BaseResultMap" type="com.jwb.model.po.CourseBase">
+    <resultMap id="BaseResultMap" type="com.jwb.content.model.po.CourseBase">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="companyId" column="company_id" jdbcType="BIGINT"/>
         <result property="companyName" column="company_name" jdbcType="VARCHAR"/>

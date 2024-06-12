@@ -26,7 +26,6 @@ public class DictionaryController {
 
     @GetMapping("/dictionary/all")
     public List<Dictionary> queryAll() {
-        List<Dictionary> dictionaries = dictionaryService.queryAll();
         return dictionaryService.queryAll();
     }
 

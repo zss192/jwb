@@ -30,3 +30,5 @@ logs/
 
 ### VS Code ###
 .vscode/
+
+generator/

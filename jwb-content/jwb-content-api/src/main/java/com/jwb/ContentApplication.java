@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 内容管理启动类
  */
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.jwb")
 @EnableSwagger2Doc
 public class ContentApplication {
     public static void main(String[] args) {

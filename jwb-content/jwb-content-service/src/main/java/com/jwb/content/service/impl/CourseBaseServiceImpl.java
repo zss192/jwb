@@ -2,6 +2,7 @@ package com.jwb.content.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jwb.base.exception.JwbException;
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
 import com.jwb.content.mapper.CourseBaseMapper;
@@ -68,6 +69,35 @@ public class CourseBaseServiceImpl implements CourseBaseService {
     @Transactional
     @Override
     public CourseBaseInfoDto createCourseBase(Long companyId, AddCourseDto addCourseDto) {
+        //合法性校验
+        if (StringUtils.isBlank(addCourseDto.getName())) {
+            throw new JwbException("课程名称为空");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getMt())) {
+            throw new JwbException("课程分类为空");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getSt())) {
+            throw new JwbException("课程分类为空");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getGrade())) {
+            throw new JwbException("课程等级为空");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getTeachmode())) {
+            throw new JwbException("教育模式为空");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getUsers())) {
+            throw new JwbException("适应人群");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getCharge())) {
+            throw new JwbException("收费规则为空");
+        }
+
         // 向课程基本信息表course_base写入数据
         CourseBase courseBase = new CourseBase();
         BeanUtils.copyProperties(addCourseDto, courseBase);
@@ -86,7 +116,7 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         Long courseId = courseBase.getId();
         courseMarket.setId(courseId);
         saveCourseMarket(courseMarket);
-        
+
         return getCourseBaseInfo(courseId);
     }
 
@@ -110,22 +140,22 @@ public class CourseBaseServiceImpl implements CourseBaseService {
     }
 
     // 保存营销信息
-    private int saveCourseMarket(CourseMarket courseMarket) {
+    private void saveCourseMarket(CourseMarket courseMarket) {
         String charge = courseMarket.getCharge();
         if (StringUtils.isEmpty(charge)) {
-            throw new RuntimeException("收费规则为空");
+            JwbException.cast("收费规则为空");
         }
         if (charge.equals("201001")) {
             if (courseMarket.getPrice() == null || courseMarket.getPrice().floatValue() <= 0) {
-                throw new RuntimeException("课程的价格不能为空且必须大于0");
+                JwbException.cast("课程设置了收费，价格不能为空，且必须大于0");
             }
         }
         Long id = courseMarket.getId();
         CourseMarket courseMarketQuery = courseMarketMapper.selectById(id);
         if (courseMarketQuery == null) {
-            return courseMarketMapper.insert(courseMarket);
+            courseMarketMapper.insert(courseMarket);
         } else {
-            return courseMarketMapper.updateById(courseMarketQuery);
+            courseMarketMapper.updateById(courseMarketQuery);
         }
     }
 }

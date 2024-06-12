@@ -2,6 +2,8 @@ package com.jwb.content.service;
 
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
+import com.jwb.content.model.dto.AddCourseDto;
+import com.jwb.content.model.dto.CourseBaseInfoDto;
 import com.jwb.content.model.dto.QueryCourseParamsDto;
 import com.jwb.content.model.po.CourseBase;
 
@@ -13,4 +15,7 @@ import com.jwb.content.model.po.CourseBase;
 public interface CourseBaseService {
     // 课程分页查询
     PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto);
+
+    // 添加课程
+    CourseBaseInfoDto createCourseBase(Long companyId, AddCourseDto addCourseDto);
 }

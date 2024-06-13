@@ -1,5 +1,7 @@
 package com.jwb.content.model.po;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,6 +18,7 @@ public class CourseMarket implements Serializable {
     /**
      * 主键，课程id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /**
      * 收费规则，对应数据字典

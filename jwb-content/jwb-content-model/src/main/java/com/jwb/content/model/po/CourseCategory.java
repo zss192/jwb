@@ -1,5 +1,8 @@
 package com.jwb.content.model.po;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 import java.io.Serializable;
 
 /**
@@ -13,6 +16,7 @@ public class CourseCategory implements Serializable {
     /**
      * 主键
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private String id;
     /**
      * 分类名称

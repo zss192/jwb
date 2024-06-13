@@ -1,5 +1,8 @@
 package com.jwb.content.model.po;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -9,6 +12,8 @@ import java.util.Date;
  * @author makejava
  * @since 2024-06-10 18:41:30
  */
+@Setter
+@Getter
 public class Teachplan implements Serializable {
     private static final long serialVersionUID = -45490833757660093L;
 
@@ -74,134 +79,6 @@ public class Teachplan implements Serializable {
      */
     private Date changeDate;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getPname() {
-        return pname;
-    }
-
-    public void setPname(String pname) {
-        this.pname = pname;
-    }
-
-    public Long getParentid() {
-        return parentid;
-    }
-
-    public void setParentid(Long parentid) {
-        this.parentid = parentid;
-    }
-
-    public Integer getGrade() {
-        return grade;
-    }
-
-    public void setGrade(Integer grade) {
-        this.grade = grade;
-    }
-
-    public String getMediaType() {
-        return mediaType;
-    }
-
-    public void setMediaType(String mediaType) {
-        this.mediaType = mediaType;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getTimelength() {
-        return timelength;
-    }
-
-    public void setTimelength(String timelength) {
-        this.timelength = timelength;
-    }
-
-    public Integer getOrderby() {
-        return orderby;
-    }
-
-    public void setOrderby(Integer orderby) {
-        this.orderby = orderby;
-    }
-
-    public Long getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
-    }
-
-    public Long getCoursePubId() {
-        return coursePubId;
-    }
-
-    public void setCoursePubId(Long coursePubId) {
-        this.coursePubId = coursePubId;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getIsPreview() {
-        return isPreview;
-    }
-
-    public void setIsPreview(String isPreview) {
-        this.isPreview = isPreview;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public Date getChangeDate() {
-        return changeDate;
-    }
-
-    public void setChangeDate(Date changeDate) {
-        this.changeDate = changeDate;
-    }
 
 }
 

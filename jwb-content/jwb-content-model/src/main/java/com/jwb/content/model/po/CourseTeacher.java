@@ -1,7 +1,10 @@
 package com.jwb.content.model.po;
 
+
+import lombok.Data;
+
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 课程-教师关系表(CourseTeacher)实体类
@@ -9,6 +12,7 @@ import java.util.Date;
  * @author makejava
  * @since 2024-06-10 18:41:30
  */
+@Data
 public class CourseTeacher implements Serializable {
     private static final long serialVersionUID = -13892189285468110L;
     /**
@@ -38,64 +42,6 @@ public class CourseTeacher implements Serializable {
     /**
      * 创建时间
      */
-    private Date createDate;
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
-    }
-
-    public String getTeacherName() {
-        return teacherName;
-    }
-
-    public void setTeacherName(String teacherName) {
-        this.teacherName = teacherName;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public String getIntroduction() {
-        return introduction;
-    }
-
-    public void setIntroduction(String introduction) {
-        this.introduction = introduction;
-    }
-
-    public String getPhotograph() {
-        return photograph;
-    }
-
-    public void setPhotograph(String photograph) {
-        this.photograph = photograph;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
+    private LocalDateTime createDate;
 }
 

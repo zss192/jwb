@@ -69,35 +69,6 @@ public class CourseBaseServiceImpl implements CourseBaseService {
     @Transactional
     @Override
     public CourseBaseInfoDto createCourseBase(Long companyId, AddCourseDto addCourseDto) {
-        //合法性校验
-        if (StringUtils.isBlank(addCourseDto.getName())) {
-            throw new JwbException("课程名称为空");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getMt())) {
-            throw new JwbException("课程分类为空");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getSt())) {
-            throw new JwbException("课程分类为空");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getGrade())) {
-            throw new JwbException("课程等级为空");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getTeachmode())) {
-            throw new JwbException("教育模式为空");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getUsers())) {
-            throw new JwbException("适应人群");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getCharge())) {
-            throw new JwbException("收费规则为空");
-        }
-
         // 向课程基本信息表course_base写入数据
         CourseBase courseBase = new CourseBase();
         BeanUtils.copyProperties(addCourseDto, courseBase);

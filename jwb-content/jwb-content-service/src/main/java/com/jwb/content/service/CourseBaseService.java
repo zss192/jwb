@@ -4,6 +4,7 @@ import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
 import com.jwb.content.model.dto.AddCourseDto;
 import com.jwb.content.model.dto.CourseBaseInfoDto;
+import com.jwb.content.model.dto.EditCourseDto;
 import com.jwb.content.model.dto.QueryCourseParamsDto;
 import com.jwb.content.model.po.CourseBase;
 
@@ -18,4 +19,10 @@ public interface CourseBaseService {
 
     // 添加课程
     CourseBaseInfoDto createCourseBase(Long companyId, AddCourseDto addCourseDto);
+
+    // 根据课程id查询课程信息
+    CourseBaseInfoDto getCourseBaseInfo(Long courseId);
+
+    // 修改课程信息
+    CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto);
 }

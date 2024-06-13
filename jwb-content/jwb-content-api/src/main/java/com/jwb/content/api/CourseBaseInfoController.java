@@ -5,6 +5,7 @@ import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
 import com.jwb.content.model.dto.AddCourseDto;
 import com.jwb.content.model.dto.CourseBaseInfoDto;
+import com.jwb.content.model.dto.EditCourseDto;
 import com.jwb.content.model.dto.QueryCourseParamsDto;
 import com.jwb.content.model.po.CourseBase;
 import com.jwb.content.service.CourseBaseService;
@@ -12,9 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Api(value = "课程信息管理接口", tags = "课程信息管理接口")
 @RestController
@@ -36,4 +35,17 @@ public class CourseBaseInfoController {
         return courseBaseService.createCourseBase(companyId, addCourseDto);
     }
 
+    @ApiOperation("根据课程id查询课程基础信息")
+    @GetMapping("/course/{courseId}")
+    public CourseBaseInfoDto getCourseBaseById(@PathVariable Long courseId) {
+        return courseBaseService.getCourseBaseInfo(courseId);
+    }
+
+    @ApiOperation("修改课程基础信息接口")
+    @PutMapping("/course")
+    public CourseBaseInfoDto modifyCourseBase(@RequestBody EditCourseDto editCourseDto) {
+        // TODO:获取机构id，暂时固定数据
+        Long companyId = 1232141425L;
+        return courseBaseService.updateCourseBase(companyId, editCourseDto);
+    }
 }

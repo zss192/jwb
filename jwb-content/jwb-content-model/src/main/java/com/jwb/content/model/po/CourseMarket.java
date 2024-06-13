@@ -3,7 +3,6 @@ package com.jwb.content.model.po;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * 课程营销信息(CourseMarket)实体类
@@ -25,11 +24,11 @@ public class CourseMarket implements Serializable {
     /**
      * 现价
      */
-    private BigDecimal price;
+    private Float price;
     /**
      * 原价
      */
-    private BigDecimal originalPrice;
+    private Float originalPrice;
     /**
      * 咨询qq
      */

@@ -10,10 +10,12 @@ import com.jwb.content.mapper.CourseCategoryMapper;
 import com.jwb.content.mapper.CourseMarketMapper;
 import com.jwb.content.model.dto.AddCourseDto;
 import com.jwb.content.model.dto.CourseBaseInfoDto;
+import com.jwb.content.model.dto.EditCourseDto;
 import com.jwb.content.model.dto.QueryCourseParamsDto;
 import com.jwb.content.model.po.CourseBase;
 import com.jwb.content.model.po.CourseMarket;
 import com.jwb.content.service.CourseBaseService;
+import com.jwb.content.service.CourseMarketService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,8 @@ public class CourseBaseServiceImpl implements CourseBaseService {
     CourseMarketMapper courseMarketMapper;
     @Autowired
     CourseCategoryMapper courseCategoryMapper;
+    @Autowired
+    CourseMarketService courseMarketService;
 
     @Override
     public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
@@ -92,7 +96,8 @@ public class CourseBaseServiceImpl implements CourseBaseService {
     }
 
     // 查询课程信息
-    public CourseBaseInfoDto getCourseBaseInfo(long courseId) {
+    @Override
+    public CourseBaseInfoDto getCourseBaseInfo(Long courseId) {
         CourseBase courseBase = courseBaseMapper.selectById(courseId);
         if (courseBase == null) {
             return null;
@@ -128,6 +133,44 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         } else {
             courseMarketMapper.updateById(courseMarketQuery);
         }
+    }
+
+    @Override
+    @Transactional
+    public CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto) {
+        // 判断当前修改课程是否属于当前机构
+        Long courseId = editCourseDto.getId();
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if (!companyId.equals(courseBase.getCompanyId())) {
+            JwbException.cast("只允许修改本机构的课程");
+        }
+        // 拷贝对象
+        BeanUtils.copyProperties(editCourseDto, courseBase);
+        // 更新，设置更新时间
+        courseBase.setChangeDate(LocalDateTime.now());
+        courseBaseMapper.updateById(courseBase);
+        // 查询课程营销信息
+        CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
+        // 由于课程营销信息不是必填项，故这里先判断一下
+        if (courseMarket == null) {
+            courseMarket = new CourseMarket();
+        }
+        courseMarket.setId(courseId);
+        // 获取课程收费状态并设置
+        String charge = editCourseDto.getCharge();
+        courseMarket.setCharge(charge);
+        // 如果课程收费，则判断价格是否正常
+        if (charge.equals("201001")) {
+            Float price = editCourseDto.getPrice();
+            if (price == null || price <= 0) {
+                JwbException.cast("课程设置了收费，价格不能为空，且必须大于0");
+            }
+        }
+        // 对象拷贝
+        BeanUtils.copyProperties(editCourseDto, courseMarket);
+        // 有则更新，无则插入
+        courseMarketService.saveOrUpdate(courseMarket);
+        return getCourseBaseInfo(courseId);
     }
 }
 

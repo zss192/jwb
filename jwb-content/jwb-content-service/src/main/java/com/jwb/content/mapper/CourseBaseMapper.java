@@ -2,6 +2,7 @@ package com.jwb.content.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jwb.content.model.po.CourseBase;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * @author zss
@@ -10,6 +11,7 @@ import com.jwb.content.model.po.CourseBase;
  * @Entity generator.domain.CourseBase
  */
 
+@Mapper
 public interface CourseBaseMapper extends BaseMapper<CourseBase> {
 
 }

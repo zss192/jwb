@@ -1,20 +1,20 @@
 #微服务配置
 spring:
   application:
-    name: system-api
+    name: content-api
   cloud:
     nacos:
       server-addr: 192.168.101.65:8848
       discovery:
-        namespace: ${spring.profiles.active}
+        namespace: dev
         group: jwb-project
       config:
-        namespace: ${spring.profiles.active}
+        namespace: dev
         group: jwb-project
         file-extension: yaml
         refresh-enabled: true
         extension-configs:
-          - data-id: system-service-${spring.profiles.active}.yaml
+          - data-id: content-service-${spring.profiles.active}.yaml
             group: jwb-project
             refresh: true
         shared-configs:

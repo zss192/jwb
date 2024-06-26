@@ -2,6 +2,7 @@ package com.jwb.media.service;
 
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
+import com.jwb.base.model.RestResponse;
 import com.jwb.media.model.dto.QueryMediaParamsDto;
 import com.jwb.media.model.dto.UploadFileParamsDto;
 import com.jwb.media.model.dto.UploadFileResultDto;
@@ -45,4 +46,21 @@ public interface MediaFileService {
      * @param bucket              桶
      */
     MediaFiles addMediaFilesToDB(Long companyId, UploadFileParamsDto uploadFileParamsDto, String objectName, String fileMD5, String bucket);
+
+    /**
+     * 检查文件是否存在
+     *
+     * @param fileMd5 文件的md5
+     * @return
+     */
+    RestResponse<Boolean> checkFile(String fileMd5);
+
+    /**
+     * 检查分块是否存在
+     *
+     * @param fileMd5    文件的MD5
+     * @param chunkIndex 分块序号
+     * @return
+     */
+    RestResponse<Boolean> checkChunk(String fileMd5, int chunkIndex);
 }

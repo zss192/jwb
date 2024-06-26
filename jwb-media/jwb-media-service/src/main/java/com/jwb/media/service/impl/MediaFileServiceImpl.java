@@ -7,12 +7,14 @@ import com.j256.simplemagic.ContentInfoUtil;
 import com.jwb.base.exception.JwbException;
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
+import com.jwb.base.model.RestResponse;
 import com.jwb.media.mapper.MediaFilesMapper;
 import com.jwb.media.model.dto.QueryMediaParamsDto;
 import com.jwb.media.model.dto.UploadFileParamsDto;
 import com.jwb.media.model.dto.UploadFileResultDto;
 import com.jwb.media.model.po.MediaFiles;
 import com.jwb.media.service.MediaFileService;
+import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -174,5 +177,66 @@ public class MediaFileServiceImpl implements MediaFileService {
             log.debug("上传到文件系统出错:{}", e.getMessage());
             throw new JwbException("上传到文件系统出错");
         }
+    }
+
+    /**
+     * 检查文件是否存在
+     *
+     * @param fileMd5 文件的md5
+     */
+    @Override
+    public RestResponse<Boolean> checkFile(String fileMd5) {
+        MediaFiles mediaFiles = mediaFilesMapper.selectById(fileMd5);
+        // 数据库中不存在，则直接返回false 表示不存在
+        if (mediaFiles == null) {
+            return RestResponse.success(false);
+        }
+        // 若数据库中存在，根据数据库中的文件信息，继续判断bucket中是否存在
+        try {
+            InputStream inputStream = minioClient.getObject(GetObjectArgs
+                    .builder()
+                    .bucket(mediaFiles.getBucket())
+                    .object(mediaFiles.getFilePath())
+                    .build());
+            if (inputStream == null) {
+                return RestResponse.success(false);
+            }
+        } catch (Exception e) {
+            return RestResponse.success(false);
+        }
+        return RestResponse.success(true);
+    }
+
+    /**
+     * 检查分块是否存在
+     *
+     * @param fileMd5    文件的MD5
+     * @param chunkIndex 分块序号
+     */
+    @Override
+    public RestResponse<Boolean> checkChunk(String fileMd5, int chunkIndex) {
+        // 获取分块目录 1/f/1f229319d6fed3431d2f9d06193a433b/chunk/
+        String chunkFileFolderPath = getChunkFileFolderPath(fileMd5);
+        // 获取分块的具体路径 1/f/1f229319d6fed3431d2f9d06193a433b/chunk/2
+        String chunkFilePath = chunkFileFolderPath + chunkIndex;
+        try {
+            // 判断分块是否存在
+            InputStream inputStream = minioClient.getObject(GetObjectArgs
+                    .builder()
+                    .bucket(bucket_files)
+                    .object(chunkFilePath)
+                    .build());
+            // 不存在返回false
+            if (inputStream == null) {
+                return RestResponse.success(false);
+            }
+        } catch (Exception e) {
+            return RestResponse.success(false);
+        }
+        return RestResponse.success();
+    }
+
+    private String getChunkFileFolderPath(String fileMd5) {
+        return fileMd5.charAt(0) + "/" + fileMd5.charAt(1) + "/" + fileMd5 + "/" + "chunk" + "/";
     }
 }

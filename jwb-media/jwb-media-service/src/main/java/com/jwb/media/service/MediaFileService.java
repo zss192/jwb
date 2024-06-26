@@ -52,7 +52,7 @@ public interface MediaFileService {
      *
      * @param fileMd5 文件的md5
      */
-    RestResponse<Boolean> checkFile(String fileMd5);
+    RestResponse<Boolean> checkFile(String fileMd5, String fileSize);
 
     /**
      * 检查分块是否存在

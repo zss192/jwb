@@ -52,6 +52,8 @@ public class MediaFileServiceImpl implements MediaFileService {
 
     @Value("${minio.bucket.files}")
     private String bucket_files;
+    @Value("${spring.servlet.multipart.max-file-size}")
+    private String max_file_size;
 
     /**
      * 根据日期自动生成目录
@@ -240,7 +242,13 @@ public class MediaFileServiceImpl implements MediaFileService {
      * @param fileMd5 文件的md5
      */
     @Override
-    public RestResponse<Boolean> checkFile(String fileMd5) {
+    public RestResponse<Boolean> checkFile(String fileMd5, String fileSize) {
+        // 首先检查文件大小是否超过最大限制
+        int uploadFileSize = Integer.parseInt(fileSize);
+        int maxFileSize = Integer.parseInt(max_file_size.substring(0, max_file_size.length() - 2)) * 1024 * 1024;
+        if (uploadFileSize > maxFileSize) {
+            JwbException.cast("文件大小超过限制，最大为：" + max_file_size);
+        }
         MediaFiles mediaFiles = mediaFilesMapper.selectById(fileMd5);
         // 数据库中不存在，则直接返回false 表示不存在
         if (mediaFiles == null) {
@@ -405,9 +413,10 @@ public class MediaFileServiceImpl implements MediaFileService {
 
             // 2.对合并后的文件通过MD5值进行校验
             try (FileInputStream mergeInputStream = new FileInputStream(mergeFile)) {
-                String mergeMd5 = DigestUtils.md5DigestAsHex(mergeInputStream);
+                String mergeMd5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(mergeInputStream);
                 // 前端传过来的md5和合并后文件的md5不等则检验失败
                 if (!fileMd5.equals(mergeMd5)) {
+                    log.error("合并文件校验失败，原文件md5：{}，合并后md5：{}", fileMd5, mergeMd5);
                     JwbException.cast("合并文件校验失败");
                 }
                 log.debug("合并文件校验通过：{}", mergeFile.getAbsolutePath());

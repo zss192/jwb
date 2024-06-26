@@ -16,11 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class BigFilesController {
     @Autowired
     MediaFileService mediaFileService;
+    // TODO：上传超过200MB的大文件前端代码有问题，控制台显示数组越界
 
     @ApiOperation(value = "文件上传前检查文件")
     @PostMapping("/upload/checkfile")
-    public RestResponse<Boolean> checkFile(@RequestParam("fileMd5") String fileMd5) {
-        return mediaFileService.checkFile(fileMd5);
+    public RestResponse<Boolean> checkFile(@RequestParam("fileMd5") String fileMd5, @RequestParam("fileSize") String fileSize) {
+        return mediaFileService.checkFile(fileMd5, fileSize);
     }
 
     @ApiOperation(value = "分块文件上传前检查分块")

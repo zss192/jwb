@@ -60,6 +60,16 @@ public class MediaFileServiceImpl implements MediaFileService {
         return dateFormat.format(new Date());
     }
 
+    /**
+     * 根据md5生成文件存放路径
+     *
+     * @param fileMd5
+     * @return
+     */
+    private String getChunkFileFolderPath(String fileMd5) {
+        return fileMd5.charAt(0) + "/" + fileMd5.charAt(1) + "/" + fileMd5 + "/" + "chunk" + "/";
+    }
+
     @Override
     public PageResult<MediaFiles> queryMediaFiels(Long companyId, PageParams pageParams, QueryMediaParamsDto queryMediaParamsDto) {
 
@@ -236,7 +246,24 @@ public class MediaFileServiceImpl implements MediaFileService {
         return RestResponse.success();
     }
 
-    private String getChunkFileFolderPath(String fileMd5) {
-        return fileMd5.charAt(0) + "/" + fileMd5.charAt(1) + "/" + fileMd5 + "/" + "chunk" + "/";
+    /**
+     * 上传分块
+     *
+     * @param fileMd5 文件MD5
+     * @param chunk   分块序号
+     * @param bytes   文件字节
+     * @return
+     */
+    @Override
+    public RestResponse<Boolean> uploadChunk(String fileMd5, int chunk, byte[] bytes) {
+        // 分块文件路径
+        String chunkFilePath = getChunkFileFolderPath(fileMd5) + chunk;
+        try {
+            addMediaFilesToMinIO(bytes, bucket_files, chunkFilePath);
+            return RestResponse.success(true);
+        } catch (Exception e) {
+            log.debug("上传分块文件：{}失败：{}", chunkFilePath, e.getMessage());
+        }
+        return RestResponse.validfail("上传文件失败", false);
     }
 }

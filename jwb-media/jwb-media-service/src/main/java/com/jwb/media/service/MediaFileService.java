@@ -63,4 +63,14 @@ public interface MediaFileService {
      * @return
      */
     RestResponse<Boolean> checkChunk(String fileMd5, int chunkIndex);
+
+    /**
+     * 上传分块
+     *
+     * @param fileMd5 文件MD5
+     * @param chunk   分块序号
+     * @param bytes   文件字节
+     * @return
+     */
+    RestResponse<Boolean> uploadChunk(String fileMd5, int chunk, byte[] bytes);
 }

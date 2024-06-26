@@ -51,7 +51,6 @@ public interface MediaFileService {
      * 检查文件是否存在
      *
      * @param fileMd5 文件的md5
-     * @return
      */
     RestResponse<Boolean> checkFile(String fileMd5);
 
@@ -60,7 +59,6 @@ public interface MediaFileService {
      *
      * @param fileMd5    文件的MD5
      * @param chunkIndex 分块序号
-     * @return
      */
     RestResponse<Boolean> checkChunk(String fileMd5, int chunkIndex);
 
@@ -70,7 +68,14 @@ public interface MediaFileService {
      * @param fileMd5 文件MD5
      * @param chunk   分块序号
      * @param bytes   文件字节
-     * @return
      */
     RestResponse<Boolean> uploadChunk(String fileMd5, int chunk, byte[] bytes);
+
+    /**
+     * @param companyId           机构id
+     * @param fileMd5             文件md5
+     * @param chunkTotal          分块总和
+     * @param uploadFileParamsDto 文件信息
+     */
+    RestResponse<Boolean> mergeChunks(Long companyId, String fileMd5, int chunkTotal, UploadFileParamsDto uploadFileParamsDto);
 }

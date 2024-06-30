@@ -1,5 +1,6 @@
 package com.jwb.content.api;
 
+import com.jwb.content.model.dto.BindTeachplanMediaDto;
 import com.jwb.content.model.dto.SaveTeachplanDto;
 import com.jwb.content.model.dto.TeachplanDto;
 import com.jwb.content.service.TeachplanService;
@@ -40,5 +41,17 @@ public class TeachplanController {
     @PostMapping("/teachplan/{moveType}/{teachplanId}")
     public void orderByTeachplan(@PathVariable String moveType, @PathVariable Long teachplanId) {
         teachplanService.orderByTeachplan(moveType, teachplanId);
+    }
+
+    @ApiOperation("课程计划与媒资信息绑定")
+    @PostMapping("/teachplan/association/media")
+    public void associationMedia(@RequestBody BindTeachplanMediaDto bindTeachplanMediaDto) {
+        teachplanService.associationMedia(bindTeachplanMediaDto);
+    }
+
+    @ApiOperation("课程计划解除媒资信息绑定")
+    @DeleteMapping("/teachplan/association/media/{teachplanId}/{mediaId}")
+    public void unassociationMedia(@PathVariable Long teachplanId, @PathVariable String mediaId) {
+        teachplanService.unassociationMedia(teachplanId, mediaId);
     }
 }

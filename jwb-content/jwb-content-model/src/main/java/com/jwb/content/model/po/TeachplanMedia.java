@@ -2,9 +2,11 @@ package com.jwb.content.model.po;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * (TeachplanMedia)实体类
@@ -12,6 +14,8 @@ import java.util.Date;
  * @author makejava
  * @since 2024-06-10 18:41:30
  */
+@Setter
+@Getter
 public class TeachplanMedia implements Serializable {
     private static final long serialVersionUID = 201888176289630632L;
     /**
@@ -36,7 +40,7 @@ public class TeachplanMedia implements Serializable {
      */
     private String mediaFilename;
 
-    private Date createDate;
+    private LocalDateTime createDate;
     /**
      * 创建人
      */
@@ -46,70 +50,6 @@ public class TeachplanMedia implements Serializable {
      */
     private String changePeople;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getMediaId() {
-        return mediaId;
-    }
-
-    public void setMediaId(String mediaId) {
-        this.mediaId = mediaId;
-    }
-
-    public Long getTeachplanId() {
-        return teachplanId;
-    }
-
-    public void setTeachplanId(Long teachplanId) {
-        this.teachplanId = teachplanId;
-    }
-
-    public Long getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
-    }
-
-    public String getMediaFilename() {
-        return mediaFilename;
-    }
-
-    public void setMediaFilename(String mediaFilename) {
-        this.mediaFilename = mediaFilename;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getCreatePeople() {
-        return createPeople;
-    }
-
-    public void setCreatePeople(String createPeople) {
-        this.createPeople = createPeople;
-    }
-
-    public String getChangePeople() {
-        return changePeople;
-    }
-
-    public void setChangePeople(String changePeople) {
-        this.changePeople = changePeople;
-    }
 
 }
 

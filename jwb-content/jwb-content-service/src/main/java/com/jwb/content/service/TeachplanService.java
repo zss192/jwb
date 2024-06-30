@@ -1,5 +1,6 @@
 package com.jwb.content.service;
 
+import com.jwb.content.model.dto.BindTeachplanMediaDto;
 import com.jwb.content.model.dto.SaveTeachplanDto;
 import com.jwb.content.model.dto.TeachplanDto;
 
@@ -13,4 +14,8 @@ public interface TeachplanService {
     void deleteTeachplan(Long teachplanId);
 
     void orderByTeachplan(String moveType, Long teachplanId);
+
+    void associationMedia(BindTeachplanMediaDto bindTeachplanMediaDto);
+
+    void unassociationMedia(Long teachPlanId, String mediaId);
 }

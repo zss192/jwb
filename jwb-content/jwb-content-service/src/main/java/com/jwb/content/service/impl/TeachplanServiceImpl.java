@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jwb.base.exception.JwbException;
 import com.jwb.content.mapper.TeachplanMapper;
 import com.jwb.content.mapper.TeachplanMediaMapper;
+import com.jwb.content.model.dto.BindTeachplanMediaDto;
 import com.jwb.content.model.dto.SaveTeachplanDto;
 import com.jwb.content.model.dto.TeachplanDto;
 import com.jwb.content.model.po.Teachplan;
@@ -173,5 +174,41 @@ public class TeachplanServiceImpl implements TeachplanService {
         teachplanMapper.updateById(tmp);
         teachplanMapper.updateById(teachplan);
 
+    }
+
+    @Transactional
+    @Override
+    public void associationMedia(BindTeachplanMediaDto bindTeachplanMediaDto) {
+        Long teachplanId = bindTeachplanMediaDto.getTeachplanId();
+        // 先根据请求参数查询出对应的教学计划teachplan
+        Teachplan teachplan = teachplanMapper.selectById(teachplanId);
+        if (teachplan == null) {
+            JwbException.cast("教学计划不存在");
+        }
+        // 获取教学计划的层级，只有第二层级允许绑定媒资信息（第二层级为小节，第一层级为章节）
+        Integer grade = teachplan.getGrade();
+        if (grade != 2) {
+            JwbException.cast("只有小节允许绑定媒资信息");
+        }
+        // 绑定媒资，如果之前已经绑定过了，再次绑定为先删再插入
+        LambdaQueryWrapper<TeachplanMedia> queryWrapper = new LambdaQueryWrapper<TeachplanMedia>().eq(TeachplanMedia::getTeachplanId, teachplanId);
+        teachplanMediaMapper.delete(queryWrapper);
+
+        TeachplanMedia teachplanMedia = new TeachplanMedia();
+        teachplanMedia.setTeachplanId(bindTeachplanMediaDto.getTeachplanId());
+        teachplanMedia.setMediaFilename(bindTeachplanMediaDto.getFileName());
+        teachplanMedia.setMediaId(bindTeachplanMediaDto.getMediaId());
+        teachplanMedia.setCourseId(teachplan.getCourseId());
+        teachplanMedia.setCreateDate(LocalDateTime.now());
+        teachplanMediaMapper.insert(teachplanMedia);
+    }
+
+    @Override
+    public void unassociationMedia(Long teachPlanId, String mediaId) {
+        LambdaQueryWrapper<TeachplanMedia> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TeachplanMedia::getTeachplanId, teachPlanId)
+                .eq(TeachplanMedia::getMediaId, mediaId);
+        int a = teachplanMediaMapper.delete(queryWrapper);
+        System.out.println(a);
     }
 }

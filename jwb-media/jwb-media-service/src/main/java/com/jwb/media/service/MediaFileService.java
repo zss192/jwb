@@ -8,6 +8,8 @@ import com.jwb.media.model.dto.UploadFileParamsDto;
 import com.jwb.media.model.dto.UploadFileResultDto;
 import com.jwb.media.model.po.MediaFiles;
 
+import java.io.File;
+
 /**
  * @author zss
  * @version 1.0
@@ -80,4 +82,10 @@ public interface MediaFileService {
     RestResponse<Boolean> mergeChunks(Long companyId, String fileMd5, int chunkTotal, UploadFileParamsDto uploadFileParamsDto);
 
     MediaFiles getFileById(String mediaId);
+
+    void downloadChunkFromMinio(File file, String bucket, String objectName);
+
+    String getFilePathByMd5(String fileMd5, String extension);
+
+    void addMediaFilesToMinIO(String filePath, String bucket, String objectName);
 }

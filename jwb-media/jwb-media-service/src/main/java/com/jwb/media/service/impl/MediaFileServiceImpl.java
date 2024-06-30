@@ -9,10 +9,12 @@ import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
 import com.jwb.base.model.RestResponse;
 import com.jwb.media.mapper.MediaFilesMapper;
+import com.jwb.media.mapper.MediaProcessMapper;
 import com.jwb.media.model.dto.QueryMediaParamsDto;
 import com.jwb.media.model.dto.UploadFileParamsDto;
 import com.jwb.media.model.dto.UploadFileResultDto;
 import com.jwb.media.model.po.MediaFiles;
+import com.jwb.media.model.po.MediaProcess;
 import com.jwb.media.service.MediaFileService;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
@@ -32,6 +34,7 @@ import org.springframework.util.StringUtils;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -49,6 +52,8 @@ public class MediaFileServiceImpl implements MediaFileService {
     MinioClient minioClient;
     @Autowired
     MediaFileService currentProxy; // 构建一个当前类的代理对象
+    @Autowired
+    MediaProcessMapper mediaProcessMapper;
 
     @Value("${minio.bucket.files}")
     private String bucket_files;
@@ -79,7 +84,8 @@ public class MediaFileServiceImpl implements MediaFileService {
      * @param fileMd5   文件MD5
      * @param extension 文件扩展名
      */
-    private String getFilePathByMd5(String fileMd5, String extension) {
+    @Override
+    public String getFilePathByMd5(String fileMd5, String extension) {
         return fileMd5.charAt(0) + "/" + fileMd5.charAt(1) + "/" + fileMd5 + "/" + fileMd5 + extension;
     }
 
@@ -171,6 +177,18 @@ public class MediaFileServiceImpl implements MediaFileService {
             if (insert <= 0) {
                 JwbException.cast("保存文件信息失败");
             }
+            // 如果是avi flv mkv视频，则额外添加至视频待处理表
+            List<String> videoType = Arrays.asList("video/x-msvideo", "video/x-flv", "video/x-matroska");
+            if (videoType.contains(contentType)) {
+                MediaProcess mediaProcess = new MediaProcess();
+                BeanUtils.copyProperties(mediaFiles, mediaProcess);
+                mediaProcess.setStatus("1"); // 未处理
+                mediaProcess.setFailCount(0); // 失败次数默认为0
+                int processInsert = mediaProcessMapper.insert(mediaProcess);
+                if (processInsert <= 0) {
+                    JwbException.cast("保存avi视频到待处理表失败");
+                }
+            }
         }
         return mediaFiles;
     }
@@ -205,7 +223,8 @@ public class MediaFileServiceImpl implements MediaFileService {
      * @param bucket     桶
      * @param objectName 对象名称
      */
-    private void addMediaFilesToMinIO(String filePath, String bucket, String objectName) {
+    @Override
+    public void addMediaFilesToMinIO(String filePath, String bucket, String objectName) {
         String contentType = getContentType(objectName);
         try {
             minioClient.uploadObject(UploadObjectArgs
@@ -361,7 +380,7 @@ public class MediaFileServiceImpl implements MediaFileService {
      * @param bucket     桶
      * @param objectName 桶内文件路径
      */
-    private void downloadChunkFromMinio(File file, String bucket, String objectName) {
+    public void downloadChunkFromMinio(File file, String bucket, String objectName) {
         try (FileOutputStream fileOutputStream = new FileOutputStream(file);
              InputStream inputStream = minioClient.getObject(GetObjectArgs
                      .builder()

@@ -78,4 +78,6 @@ public interface MediaFileService {
      * @param uploadFileParamsDto 文件信息
      */
     RestResponse<Boolean> mergeChunks(Long companyId, String fileMd5, int chunkTotal, UploadFileParamsDto uploadFileParamsDto);
+
+    MediaFiles getFileById(String mediaId);
 }

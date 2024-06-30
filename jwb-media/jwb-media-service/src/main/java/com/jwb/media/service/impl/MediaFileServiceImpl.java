@@ -159,7 +159,12 @@ public class MediaFileServiceImpl implements MediaFileService {
             mediaFiles.setCreateDate(LocalDateTime.now());
             mediaFiles.setStatus("1");
             mediaFiles.setFilePath(objectName);
-            mediaFiles.setUrl("/" + bucket + "/" + objectName);
+            // 获取源文件名的contentType
+            String contentType = getContentType(objectName);
+            // 如果是图片格式或者mp4格式，则设置URL属性，否则不设置
+            if (contentType.contains("image") || contentType.contains("mp4")) {
+                mediaFiles.setUrl("/" + bucket + "/" + objectName);
+            }
             // 查阅数据字典，002003表示审核通过
             mediaFiles.setAuditStatus("002003");
             int insert = mediaFilesMapper.insert(mediaFiles);
@@ -448,5 +453,14 @@ public class MediaFileServiceImpl implements MediaFileService {
                 log.error("临时合并文件删除错误：{}", mergeFile.getPath());
             }
         }
+    }
+
+    @Override
+    public MediaFiles getFileById(String id) {
+        MediaFiles mediaFiles = mediaFilesMapper.selectById(id);
+        if (mediaFiles == null || StringUtils.isEmpty(mediaFiles.getUrl())) {
+            JwbException.cast("视频还没有转码处理");
+        }
+        return mediaFiles;
     }
 }

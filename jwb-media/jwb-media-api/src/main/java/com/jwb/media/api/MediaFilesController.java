@@ -3,6 +3,7 @@ package com.jwb.media.api;
 import com.jwb.base.exception.JwbException;
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
+import com.jwb.base.model.RestResponse;
 import com.jwb.media.model.dto.QueryMediaParamsDto;
 import com.jwb.media.model.dto.UploadFileParamsDto;
 import com.jwb.media.model.dto.UploadFileResultDto;
@@ -60,5 +61,12 @@ public class MediaFilesController {
             JwbException.cast("上传文件过程出错");
         }
         return null;
+    }
+
+    @ApiOperation(value = "预览文件")
+    @GetMapping("/preview/{mediaId}")
+    public RestResponse<String> getPlayUrlByMediaId(@PathVariable String mediaId) {
+        MediaFiles mediaFile = mediaFileService.getFileById(mediaId);
+        return RestResponse.success(mediaFile.getUrl());
     }
 }

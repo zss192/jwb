@@ -29,10 +29,18 @@ public class CoursePublishController {
         return modelAndView;
     }
 
+    // TODO: 操作成功数据库也修改成功但是前端提示404
     @ApiOperation("提交课程审核")
     @PostMapping("/courseaudit/commit/{courseId}")
     public void commitAudit(@PathVariable Long courseId) {
         Long companyId = 1232141425L;
         coursePublishService.commitAudit(companyId, courseId);
+    }
+
+    @ApiOperation("课程发布")
+    @PostMapping("/coursepublish/{courseId}")
+    public void coursePublish(@PathVariable Long courseId) {
+        Long companyId = 1232141425L;
+        coursePublishService.publishCourse(companyId, courseId);
     }
 }

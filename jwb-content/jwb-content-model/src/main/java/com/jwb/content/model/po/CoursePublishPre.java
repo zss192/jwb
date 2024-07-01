@@ -2,9 +2,10 @@ package com.jwb.content.model.po;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 课程发布(CoursePublishPre)实体类
@@ -12,6 +13,7 @@ import java.util.Date;
  * @author makejava
  * @since 2024-06-10 18:41:30
  */
+@Data
 public class CoursePublishPre implements Serializable {
     private static final long serialVersionUID = 900219079772191999L;
     /**
@@ -90,11 +92,11 @@ public class CoursePublishPre implements Serializable {
     /**
      * 提交时间
      */
-    private Date createDate;
+    private LocalDateTime createDate;
     /**
      * 审核时间
      */
-    private Date auditDate;
+    private LocalDateTime auditDate;
     /**
      * 状态
      */
@@ -120,214 +122,6 @@ public class CoursePublishPre implements Serializable {
      */
     private Integer validDays;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUsers() {
-        return users;
-    }
-
-    public void setUsers(String users) {
-        this.users = users;
-    }
-
-    public String getTags() {
-        return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getMt() {
-        return mt;
-    }
-
-    public void setMt(String mt) {
-        this.mt = mt;
-    }
-
-    public String getMtName() {
-        return mtName;
-    }
-
-    public void setMtName(String mtName) {
-        this.mtName = mtName;
-    }
-
-    public String getSt() {
-        return st;
-    }
-
-    public void setSt(String st) {
-        this.st = st;
-    }
-
-    public String getStName() {
-        return stName;
-    }
-
-    public void setStName(String stName) {
-        this.stName = stName;
-    }
-
-    public String getGrade() {
-        return grade;
-    }
-
-    public void setGrade(String grade) {
-        this.grade = grade;
-    }
-
-    public String getTeachmode() {
-        return teachmode;
-    }
-
-    public void setTeachmode(String teachmode) {
-        this.teachmode = teachmode;
-    }
-
-    public String getPic() {
-        return pic;
-    }
-
-    public void setPic(String pic) {
-        this.pic = pic;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getMarket() {
-        return market;
-    }
-
-    public void setMarket(String market) {
-        this.market = market;
-    }
-
-    public String getTeachplan() {
-        return teachplan;
-    }
-
-    public void setTeachplan(String teachplan) {
-        this.teachplan = teachplan;
-    }
-
-    public String getTeachers() {
-        return teachers;
-    }
-
-    public void setTeachers(String teachers) {
-        this.teachers = teachers;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public Date getAuditDate() {
-        return auditDate;
-    }
-
-    public void setAuditDate(Date auditDate) {
-        this.auditDate = auditDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public String getCharge() {
-        return charge;
-    }
-
-    public void setCharge(String charge) {
-        this.charge = charge;
-    }
-
-    public Object getPrice() {
-        return price;
-    }
-
-    public void setPrice(Object price) {
-        this.price = price;
-    }
-
-    public Object getOriginalPrice() {
-        return originalPrice;
-    }
-
-    public void setOriginalPrice(Object originalPrice) {
-        this.originalPrice = originalPrice;
-    }
-
-    public Integer getValidDays() {
-        return validDays;
-    }
-
-    public void setValidDays(Integer validDays) {
-        this.validDays = validDays;
-    }
 
 }
 

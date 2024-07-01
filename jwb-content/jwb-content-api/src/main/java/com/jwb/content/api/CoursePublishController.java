@@ -9,11 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 @Slf4j
 @Controller
-@Api(value = "课程预览相关接口", tags = "课程预览相关接口")
+@Api(value = "课程发布相关接口", tags = "课程发布相关接口")
 public class CoursePublishController {
     @Autowired
     private CoursePublishService coursePublishService;
@@ -26,5 +27,12 @@ public class CoursePublishController {
         modelAndView.setViewName("course_template");
         modelAndView.addObject("model", coursePreviewInfo);
         return modelAndView;
+    }
+
+    @ApiOperation("提交课程审核")
+    @PostMapping("/courseaudit/commit/{courseId}")
+    public void commitAudit(@PathVariable Long courseId) {
+        Long companyId = 1232141425L;
+        coursePublishService.commitAudit(companyId, courseId);
     }
 }

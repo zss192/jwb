@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jwb.content.mapper.CoursePublishPreMapper">
+
+    <resultMap id="BaseResultMap" type="com.jwb.content.model.po.CoursePublishPre">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="company_id" column="company_id" jdbcType="BIGINT"/>
+        <result property="company_name" column="company_name" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="users" column="users" jdbcType="VARCHAR"/>
+        <result property="tags" column="tags" jdbcType="VARCHAR"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="mt" column="mt" jdbcType="VARCHAR"/>
+        <result property="mt_name" column="mt_name" jdbcType="VARCHAR"/>
+        <result property="st" column="st" jdbcType="VARCHAR"/>
+        <result property="st_name" column="st_name" jdbcType="VARCHAR"/>
+        <result property="grade" column="grade" jdbcType="VARCHAR"/>
+        <result property="teachmode" column="teachmode" jdbcType="VARCHAR"/>
+        <result property="pic" column="pic" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="market" column="market" jdbcType="VARCHAR"/>
+        <result property="teachplan" column="teachplan" jdbcType="VARCHAR"/>
+        <result property="teachers" column="teachers" jdbcType="VARCHAR"/>
+        <result property="create_date" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="audit_date" column="audit_date" jdbcType="TIMESTAMP"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="charge" column="charge" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="FLOAT"/>
+        <result property="original_price" column="original_price" jdbcType="FLOAT"/>
+        <result property="valid_days" column="valid_days" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,company_id,company_name,
+        name,users,tags,
+        username,mt,mt_name,
+        st,st_name,grade,
+        teachmode,pic,description,
+        market,teachplan,teachers,
+        create_date,audit_date,status,
+        remark,charge,price,
+        original_price,valid_days
+    </sql>
+</mapper>

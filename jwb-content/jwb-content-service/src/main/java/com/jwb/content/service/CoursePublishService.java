@@ -46,4 +46,11 @@ public interface CoursePublishService {
      * @param file     静态化文件
      */
     void uploadCourseHtml(Long courseId, File file);
+
+    /**
+     * 保存课程索引
+     *
+     * @param courseId 课程id
+     */
+    Boolean saveCourseIndex(Long courseId);
 }

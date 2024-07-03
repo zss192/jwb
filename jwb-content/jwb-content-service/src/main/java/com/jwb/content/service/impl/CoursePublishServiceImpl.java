@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.jwb.base.exception.JwbException;
 import com.jwb.config.MultipartSupportConfig;
 import com.jwb.content.feignclient.MediaServiceClient;
+import com.jwb.content.feignclient.SearchServiceClient;
 import com.jwb.content.mapper.CourseBaseMapper;
 import com.jwb.content.mapper.CourseMarketMapper;
 import com.jwb.content.mapper.CoursePublishMapper;
@@ -11,10 +12,7 @@ import com.jwb.content.mapper.CoursePublishPreMapper;
 import com.jwb.content.model.dto.CourseBaseInfoDto;
 import com.jwb.content.model.dto.CoursePreviewDto;
 import com.jwb.content.model.dto.TeachplanDto;
-import com.jwb.content.model.po.CourseBase;
-import com.jwb.content.model.po.CourseMarket;
-import com.jwb.content.model.po.CoursePublish;
-import com.jwb.content.model.po.CoursePublishPre;
+import com.jwb.content.model.po.*;
 import com.jwb.content.service.CourseBaseService;
 import com.jwb.content.service.CoursePublishService;
 import com.jwb.content.service.TeachplanService;
@@ -59,6 +57,8 @@ public class CoursePublishServiceImpl implements CoursePublishService {
     private MqMessageService mqMessageService;
     @Autowired
     MediaServiceClient mediaServiceClient;
+    @Autowired
+    SearchServiceClient searchServiceClient;
 
 
     @Override
@@ -237,5 +237,20 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         if (course == null) {
             JwbException.cast("远程调用媒资服务上传文件失败");
         }
+    }
+
+    @Override
+    public Boolean saveCourseIndex(Long courseId) {
+        // 1. 取出课程发布信息
+        CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+        // 2. 拷贝至课程索引对象
+        CourseIndex courseIndex = new CourseIndex();
+        BeanUtils.copyProperties(coursePublish, courseIndex);
+        // 3. 远程调用搜索服务API，添加课程索引信息
+        Boolean result = searchServiceClient.add(courseIndex);
+        if (!result) {
+            JwbException.cast("添加索引失败");
+        }
+        return true;
     }
 }

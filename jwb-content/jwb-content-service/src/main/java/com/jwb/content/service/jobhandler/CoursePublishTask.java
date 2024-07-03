@@ -28,15 +28,16 @@ public class CoursePublishTask extends MessageProcessAbstract {
 
     @Override
     public boolean execute(MqMessage mqMessage) {
+        // TODO: 面试优化：CompletableFuture 实现多任务编排
         log.debug("开始执行课程发布任务，课程id：{}", mqMessage.getBusinessKey1());
         // 一阶段：将课程信息静态页面上传至MinIO
         String courseId = mqMessage.getBusinessKey1();
         generateCourseHtml(mqMessage, Long.valueOf(courseId));
 
-        // TODO 二阶段：存储到Redis
-
-        // TODO 三阶段：存储到ElasticSearch
-
+        // TODO 二阶段：存储到ElasticSearch
+        saveCourseIndex(mqMessage, Long.valueOf(courseId));
+        // TODO 三阶段：存储到Redis
+        
         // 三阶段都成功，返回true
         return true;
     }
@@ -62,5 +63,24 @@ public class CoursePublishTask extends MessageProcessAbstract {
         coursePublishService.uploadCourseHtml(courseId, file);
         // 4. 保存第一阶段状态
         mqMessageService.completedStageOne(id);
+    }
+
+    public void saveCourseIndex(MqMessage mqMessage, Long courseId) {
+        log.debug("正在保存课程信息索引，课程id:{}", courseId);
+        // 1. 获取消息id
+        Long id = mqMessage.getId();
+        // 2. 获取小任务阶段状态
+        MqMessageService mqMessageService = this.getMqMessageService();
+        int stageTwo = mqMessageService.getStageTwo(id);
+        // 3. 当前小任务完成，无需再次处理
+        if (stageTwo == 1) {
+            log.debug("当前阶段为创建课程索引任务，已完成，无需再次处理，任务信息：{}", mqMessage);
+            return;
+        }
+        // 4. 远程调用保存课程索引接口，将课程信息上传至ElasticSearch
+        Boolean result = coursePublishService.saveCourseIndex(courseId);
+        if (result) {
+            mqMessageService.completedStageTwo(id);
+        }
     }
 }

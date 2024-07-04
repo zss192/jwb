@@ -1,11 +1,13 @@
 package com.jwb.ucenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.jwb.ucenter.feignclient.CheckCodeClient;
 import com.jwb.ucenter.mapper.JwbUserMapper;
 import com.jwb.ucenter.model.dto.AuthParamsDto;
 import com.jwb.ucenter.model.dto.JwbUserExt;
 import com.jwb.ucenter.model.po.JwbUser;
 import com.jwb.ucenter.service.AuthService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,8 +22,22 @@ public class PasswordAuthServiceImpl implements AuthService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    CheckCodeClient checkCodeClient;
+
     @Override
     public JwbUserExt execute(AuthParamsDto authParamsDto) {
+        // 校验验证码
+        String checkcode = authParamsDto.getCheckcode();
+        String checkcodekey = authParamsDto.getCheckcodekey();
+        if (StringUtils.isBlank(checkcode) || StringUtils.isBlank(checkcodekey)) {
+            throw new RuntimeException("验证码为空");
+        }
+        Boolean verify = checkCodeClient.verify(checkcodekey, checkcode);
+        if (!verify) {
+            throw new RuntimeException("验证码输入错误");
+        }
+
         // 1. 获取账号
         String username = authParamsDto.getUsername();
         // 2. 根据账号去数据库中查询是否存在

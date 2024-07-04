@@ -33,6 +33,7 @@ public class GatewayAuthFilter implements GlobalFilter, Ordered {
 
     static {
         //加载白名单
+        // TODO：security-whitelist.properties开发阶段目前是让全部请求加到白名单，后面开发完要删掉/**
         try (
                 InputStream resourceAsStream = GatewayAuthFilter.class.getResourceAsStream("/security-whitelist.properties");
         ) {

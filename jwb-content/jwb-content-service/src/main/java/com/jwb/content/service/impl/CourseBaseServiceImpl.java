@@ -46,9 +46,11 @@ public class CourseBaseServiceImpl implements CourseBaseService {
     TeachplanMapper teachplanMapper;
 
     @Override
-    public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
+    public PageResult<CourseBase> queryCourseBaseList(Long companyId, PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
         //构建查询条件对象
         LambdaQueryWrapper<CourseBase> queryWrapper = new LambdaQueryWrapper<>();
+        //构建查询条件，根据机构id查询
+        queryWrapper.eq(CourseBase::getCompanyId, companyId);
         //构建查询条件，根据课程名称查询
         queryWrapper.like(StringUtils.isNotEmpty(queryCourseParamsDto.getCourseName()), CourseBase::getName, queryCourseParamsDto.getCourseName());
         //构建查询条件，根据课程审核状态查询

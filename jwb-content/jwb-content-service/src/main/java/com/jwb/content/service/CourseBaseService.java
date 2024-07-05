@@ -15,7 +15,7 @@ import com.jwb.content.model.po.CourseBase;
  */
 public interface CourseBaseService {
     // 课程分页查询
-    PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto);
+    PageResult<CourseBase> queryCourseBaseList(Long companyId, PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto);
 
     // 添加课程
     CourseBaseInfoDto createCourseBase(Long companyId, AddCourseDto addCourseDto);

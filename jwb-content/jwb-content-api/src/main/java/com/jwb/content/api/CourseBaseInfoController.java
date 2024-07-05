@@ -3,6 +3,7 @@ package com.jwb.content.api;
 import com.jwb.base.exception.ValidationGroups;
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
+import com.jwb.base.utils.SecurityUtil;
 import com.jwb.content.model.dto.AddCourseDto;
 import com.jwb.content.model.dto.CourseBaseInfoDto;
 import com.jwb.content.model.dto.EditCourseDto;
@@ -11,6 +12,7 @@ import com.jwb.content.model.po.CourseBase;
 import com.jwb.content.service.CourseBaseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -26,14 +28,16 @@ public class CourseBaseInfoController {
     @PreAuthorize("hasAuthority('jwb_teachmanager_course_list')")
     @PostMapping("/course/list")
     public PageResult<CourseBase> list(PageParams pageParams, @RequestBody(required = false) QueryCourseParamsDto queryCourseParams) {
-        return courseBaseService.queryCourseBaseList(pageParams, queryCourseParams);
+        SecurityUtil.JwbUser user = SecurityUtil.getUser();
+        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;
+        return courseBaseService.queryCourseBaseList(companyId, pageParams, queryCourseParams);
     }
 
     @ApiOperation("创建课程")
     @PostMapping("/course")
     public CourseBaseInfoDto createCourseBase(@RequestBody @Validated(ValidationGroups.Insert.class) AddCourseDto addCourseDto) {
-        // TODO:获取机构id，暂时固定数据
-        Long companyId = 1232141425L;
+        SecurityUtil.JwbUser user = SecurityUtil.getUser();
+        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;
         return courseBaseService.createCourseBase(companyId, addCourseDto);
     }
 
@@ -46,16 +50,16 @@ public class CourseBaseInfoController {
     @ApiOperation("修改课程基础信息接口")
     @PutMapping("/course")
     public CourseBaseInfoDto modifyCourseBase(@RequestBody EditCourseDto editCourseDto) {
-        // TODO:获取机构id，暂时固定数据
-        Long companyId = 1232141425L;
+        SecurityUtil.JwbUser user = SecurityUtil.getUser();
+        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;
         return courseBaseService.updateCourseBase(companyId, editCourseDto);
     }
 
     @ApiOperation("删除课程")
     @DeleteMapping("/course/{courseId}")
     public void deleteCourse(@PathVariable Long courseId) {
-        // TODO:获取机构id，暂时固定数据
-        Long companyId = 1232141425L;
+        SecurityUtil.JwbUser user = SecurityUtil.getUser();
+        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;
         courseBaseService.delectCourse(companyId, courseId);
     }
 }

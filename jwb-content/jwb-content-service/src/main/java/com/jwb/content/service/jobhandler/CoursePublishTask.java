@@ -34,10 +34,10 @@ public class CoursePublishTask extends MessageProcessAbstract {
         String courseId = mqMessage.getBusinessKey1();
         generateCourseHtml(mqMessage, Long.valueOf(courseId));
 
-        // TODO 二阶段：存储到ElasticSearch
+        // 存储到ElasticSearch
         saveCourseIndex(mqMessage, Long.valueOf(courseId));
         // TODO 三阶段：存储到Redis
-        
+
         // 三阶段都成功，返回true
         return true;
     }

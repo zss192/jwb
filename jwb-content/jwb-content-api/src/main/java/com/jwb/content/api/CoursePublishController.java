@@ -1,10 +1,12 @@
 package com.jwb.content.api;
 
+import com.jwb.base.utils.SecurityUtil;
 import com.jwb.content.model.dto.CoursePreviewDto;
 import com.jwb.content.service.CoursePublishService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,14 +35,16 @@ public class CoursePublishController {
     @ApiOperation("提交课程审核")
     @PostMapping("/courseaudit/commit/{courseId}")
     public void commitAudit(@PathVariable Long courseId) {
-        Long companyId = 1232141425L;
+        SecurityUtil.JwbUser user = SecurityUtil.getUser();
+        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;
         coursePublishService.commitAudit(companyId, courseId);
     }
 
     @ApiOperation("课程发布")
     @PostMapping("/coursepublish/{courseId}")
     public void coursePublish(@PathVariable Long courseId) {
-        Long companyId = 1232141425L;
+        SecurityUtil.JwbUser user = SecurityUtil.getUser();
+        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;
         coursePublishService.publishCourse(companyId, courseId);
     }
 }

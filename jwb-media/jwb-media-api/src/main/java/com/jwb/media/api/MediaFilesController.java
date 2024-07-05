@@ -4,6 +4,7 @@ import com.jwb.base.exception.JwbException;
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
 import com.jwb.base.model.RestResponse;
+import com.jwb.base.utils.SecurityUtil;
 import com.jwb.media.model.dto.QueryMediaParamsDto;
 import com.jwb.media.model.dto.UploadFileParamsDto;
 import com.jwb.media.model.dto.UploadFileResultDto;
@@ -11,6 +12,7 @@ import com.jwb.media.model.po.MediaFiles;
 import com.jwb.media.service.MediaFileService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +37,8 @@ public class MediaFilesController {
     @ApiOperation("媒资列表查询接口")
     @PostMapping("/files")
     public PageResult<MediaFiles> list(PageParams pageParams, @RequestBody QueryMediaParamsDto queryMediaParamsDto) {
-        Long companyId = 1232141425L;
+        SecurityUtil.JwbUser user = SecurityUtil.getUser();
+        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;
         return mediaFileService.queryMediaFiels(companyId, pageParams, queryMediaParamsDto);
     }
 
@@ -54,7 +57,8 @@ public class MediaFilesController {
         }
         uploadFileParamsDto.setFilename(upload.getOriginalFilename());
         uploadFileParamsDto.setContentType(contentType);
-        Long companyId = 1232141425L;
+        SecurityUtil.JwbUser user = SecurityUtil.getUser();
+        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;
         try {
             return mediaFileService.uploadFile(companyId, uploadFileParamsDto, upload.getBytes(), folder, objectName);
         } catch (IOException e) {

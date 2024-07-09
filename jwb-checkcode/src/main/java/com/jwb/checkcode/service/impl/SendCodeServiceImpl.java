@@ -5,6 +5,7 @@ import com.jwb.checkcode.service.SendCodeService;
 import com.jwb.checkcode.utils.MailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,11 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class SendCodeServiceImpl implements SendCodeService {
+    @Value("${mail.user}")
+    String user;
+    @Value("${mail.password}")
+    String password;
+
     public final Long CODE_TTL = 180L;
     @Autowired
     StringRedisTemplate redisTemplate;
@@ -22,7 +28,7 @@ public class SendCodeServiceImpl implements SendCodeService {
     public void sendEMail(String email, String code) {
         // 1. 向用户发送验证码
         try {
-            MailUtil.sendTestMail(email, code);
+            MailUtil.sendTestMail(email, code, user, password);
         } catch (MessagingException e) {
             log.debug("邮件发送失败：{}", e.getMessage());
             JwbException.cast("发送验证码失败，请稍后再试");

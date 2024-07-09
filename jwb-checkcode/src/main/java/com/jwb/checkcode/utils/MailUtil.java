@@ -1,7 +1,5 @@
 package com.jwb.checkcode.utils;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -13,18 +11,13 @@ import java.util.Properties;
 
 public class MailUtil {
 
-    @Value("${mail.user}")
-    private static String user;
-    @Value("${mail.password}")
-    private static String password;
-
     /**
      * 发送邮件
      *
      * @param email 收件邮箱号
      * @param code  验证码
      */
-    public static void sendTestMail(String email, String code) throws MessagingException {
+    public static void sendTestMail(String email, String code, String user, String password) throws MessagingException {
         // 创建Properties 类用于记录邮箱的一些属性
         Properties props = new Properties();
         // 表示SMTP发送邮件，必须进行身份验证
@@ -34,9 +27,9 @@ public class MailUtil {
         //端口号，QQ邮箱端口587
         props.put("mail.smtp.port", "587");
         // 此处填写，写信人的账号
-        props.put("mail.user", "192626310@qq.com");
+        props.put("mail.user", user);
         // 此处填写16位STMP口令
-        props.put("mail.password", "xtxennexywvmcage");
+        props.put("mail.password", password);
         // 构建授权信息，用于进行SMTP进行身份验证
         Authenticator authenticator = new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -57,9 +50,9 @@ public class MailUtil {
         InternetAddress to = new InternetAddress(email);
         message.setRecipient(RecipientType.TO, to);
         // 设置邮件标题
-        message.setSubject("找回密码");
+        message.setSubject("来自教务宝的消息通知");
         // 设置邮件的内容体
-        message.setContent("尊敬的用户:你好!\n注册验证码为:" + code + "(有效期为三分钟,请勿告知他人)", "text/html;charset=UTF-8");
+        message.setContent("尊敬的用户：您好!\n您的验证码为: " + code + "(有效期为三分钟，请勿告知他人)", "text/html;charset=UTF-8");
         // 最后当然就是发送邮件啦
         Transport.send(message);
     }

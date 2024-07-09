@@ -1,12 +1,15 @@
 package com.jwb.auth.controller;
 
 import com.jwb.ucenter.mapper.JwbUserMapper;
+import com.jwb.ucenter.model.dto.FindPswDto;
 import com.jwb.ucenter.model.po.JwbUser;
+import com.jwb.ucenter.service.VerifyService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +20,8 @@ public class LoginController {
 
     @Autowired
     JwbUserMapper jwbUserMapper;
+    @Autowired
+    VerifyService verifyService;
 
 
     @RequestMapping("/login-success")
@@ -31,7 +36,7 @@ public class LoginController {
         return jwbUserMapper.selectById(id);
     }
 
-    @RequestMapping("/r/r1")
+    /*@RequestMapping("/r/r1")
     @PreAuthorize("hasAnyAuthority('p1')")
     public String r1() {
         return "访问r1资源";
@@ -41,7 +46,11 @@ public class LoginController {
     @PreAuthorize("hasAuthority('p2')")
     public String r2() {
         return "访问r2资源";
+    }*/
+
+    @ApiOperation(value = "找回密码", tags = "找回密码")
+    @RequestMapping("/findpassword")
+    public void findPassword(@RequestBody FindPswDto findPswDto) {
+        verifyService.findPassword(findPswDto);
     }
-
-
 }

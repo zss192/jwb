@@ -1,6 +1,7 @@
 package com.jwb.content.service;
 
 import com.jwb.content.model.dto.CoursePreviewDto;
+import com.jwb.content.model.po.CoursePublish;
 
 import java.io.File;
 
@@ -53,4 +54,11 @@ public interface CoursePublishService {
      * @param courseId 课程id
      */
     Boolean saveCourseIndex(Long courseId);
+
+    /**
+     * 根据id获取课程发布信息
+     *
+     * @param courseId
+     */
+    CoursePublish getCoursePublish(Long courseId);
 }

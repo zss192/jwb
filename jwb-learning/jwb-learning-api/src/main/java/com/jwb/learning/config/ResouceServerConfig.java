@@ -20,7 +20,7 @@ public class ResouceServerConfig extends ResourceServerConfigurerAdapter {
 
 
     //资源服务标识
-    public static final String RESOURCE_ID = "xuecheng-plus";
+    public static final String RESOURCE_ID = "jwb";
 
     @Autowired
     TokenStore tokenStore;

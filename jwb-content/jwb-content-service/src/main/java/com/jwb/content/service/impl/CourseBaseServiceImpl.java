@@ -177,6 +177,12 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         // 对象拷贝
         BeanUtils.copyProperties(editCourseDto, courseMarket);
         // 有则更新，无则插入
+        if (editCourseDto.getPrice() == null) {
+            courseMarket.setPrice(0F);
+        }
+        if (editCourseDto.getOriginalPrice() == null) {
+            courseMarket.setOriginalPrice(0F);
+        }
         courseMarketService.saveOrUpdate(courseMarket);
         return getCourseBaseInfo(courseId);
     }

@@ -6,28 +6,27 @@ spring:
     nacos:
       server-addr: 192.168.101.65:8848
       discovery:
-        namespace: dev166
-        group: xuecheng-plus-project
+        namespace: dev
+        group: jwb-project
       config:
-        namespace: dev166
-        group: xuecheng-plus-project
+        namespace: dev
+        group: jwb-project
         file-extension: yaml
         refresh-enabled: true
         extension-configs:
           - data-id: learning-service-${spring.profiles.active}.yaml
-            group: xuecheng-plus-project
+            group: jwb-project
             refresh: true
         shared-configs:
           - data-id: swagger-${spring.profiles.active}.yaml
-            group: xuecheng-plus-common
+            group: jwb-common
             refresh: true
           - data-id: logging-${spring.profiles.active}.yaml
-            group: xuecheng-plus-common
+            group: jwb-common
             refresh: true
           - data-id: feign-${spring.profiles.active}.yaml
-            group: xuecheng-plus-common
+            group: jwb-common
             refresh: true
-
   profiles:
     active: dev
 

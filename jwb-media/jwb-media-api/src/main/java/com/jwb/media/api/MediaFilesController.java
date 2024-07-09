@@ -57,8 +57,10 @@ public class MediaFilesController {
         }
         uploadFileParamsDto.setFilename(upload.getOriginalFilename());
         uploadFileParamsDto.setContentType(contentType);
-        SecurityUtil.JwbUser user = SecurityUtil.getUser();
-        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;
+        // TODO:定时任务上传到minio时，如修改课程导致重传html 无法获取当前登录用户
+        /*SecurityUtil.JwbUser user = SecurityUtil.getUser();
+        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;*/
+        Long companyId = 1232141425L;
         try {
             return mediaFileService.uploadFile(companyId, uploadFileParamsDto, upload.getBytes(), folder, objectName);
         } catch (IOException e) {

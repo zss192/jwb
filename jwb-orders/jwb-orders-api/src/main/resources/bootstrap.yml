@@ -1,0 +1,28 @@
+#微服务配置
+spring:
+  application:
+    name: orders-api
+  cloud:
+    nacos:
+      server-addr: 192.168.101.65:8848
+      discovery:
+        namespace: dev
+        group: jwb-project
+      config:
+        namespace: dev
+        group: jwb-project
+        file-extension: yaml
+        refresh-enabled: true
+        extension-configs:
+          - data-id: orders-service-${spring.profiles.active}.yaml
+            group: jwb-project
+            refresh: true
+        shared-configs:
+          - data-id: swagger-${spring.profiles.active}.yaml
+            group: jwb-common
+            refresh: true
+          - data-id: logging-${spring.profiles.active}.yaml
+            group: jwb-common
+            refresh: true
+  profiles:
+    active: dev

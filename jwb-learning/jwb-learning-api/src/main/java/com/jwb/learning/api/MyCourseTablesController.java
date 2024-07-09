@@ -1,0 +1,43 @@
+package com.jwb.learning.api;
+
+import com.jwb.base.model.PageResult;
+import com.jwb.learning.model.dto.JwbChooseCourseDto;
+import com.jwb.learning.model.dto.JwbCourseTablesDto;
+import com.jwb.learning.model.dto.MyCourseTableParams;
+import com.jwb.learning.model.po.JwbCourseTables;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@Api(value = "我的课程表接口", tags = "我的课程表接口")
+@Slf4j
+@RestController
+public class MyCourseTablesController {
+
+
+    @ApiOperation("添加选课")
+    @PostMapping("/choosecourse/{courseId}")
+    public JwbChooseCourseDto addChooseCourse(@PathVariable("courseId") Long courseId) {
+
+        return null;
+    }
+
+    @ApiOperation("查询学习资格")
+    @PostMapping("/choosecourse/learnstatus/{courseId}")
+    public JwbCourseTablesDto getLearnstatus(@PathVariable("courseId") Long courseId) {
+
+        return null;
+
+    }
+
+    @ApiOperation("我的课程表")
+    @GetMapping("/mycoursetable")
+    public PageResult<JwbCourseTables> mycoursetable(MyCourseTableParams params) {
+        return null;
+    }
+
+}

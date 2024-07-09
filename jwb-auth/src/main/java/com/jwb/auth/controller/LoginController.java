@@ -2,16 +2,14 @@ package com.jwb.auth.controller;
 
 import com.jwb.ucenter.mapper.JwbUserMapper;
 import com.jwb.ucenter.model.dto.FindPswDto;
+import com.jwb.ucenter.model.dto.RegisterDto;
 import com.jwb.ucenter.model.po.JwbUser;
 import com.jwb.ucenter.service.VerifyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -52,5 +50,11 @@ public class LoginController {
     @RequestMapping("/findpassword")
     public void findPassword(@RequestBody FindPswDto findPswDto) {
         verifyService.findPassword(findPswDto);
+    }
+
+    @ApiOperation(value = "注册", tags = "注册")
+    @PostMapping("/register")
+    public void register(@RequestBody RegisterDto registerDto) {
+        verifyService.register(registerDto);
     }
 }

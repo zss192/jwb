@@ -1,29 +1,44 @@
 package com.jwb.orders.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.request.AlipayTradeWapPayRequest;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jwb.base.exception.JwbException;
 import com.jwb.base.utils.IdWorkerUtil;
 import com.jwb.base.utils.QRCodeUtil;
+import com.jwb.orders.config.AlipayConfig;
 import com.jwb.orders.mapper.JwbOrdersGoodsMapper;
 import com.jwb.orders.mapper.JwbOrdersMapper;
 import com.jwb.orders.mapper.JwbPayRecordMapper;
 import com.jwb.orders.model.dto.AddOrderDto;
 import com.jwb.orders.model.dto.PayRecordDto;
+import com.jwb.orders.model.dto.PayStatusDto;
 import com.jwb.orders.model.po.JwbOrders;
 import com.jwb.orders.model.po.JwbOrdersGoods;
 import com.jwb.orders.model.po.JwbPayRecord;
 import com.jwb.orders.service.OrderService;
-import groovy.util.logging.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -39,6 +54,19 @@ public class OrderServiceImpl implements OrderService {
 
     @Value("${pay.qrcodeurl}")
     String qrcodeurl;
+
+    // 支付成功后回调地址，注意要进行内网穿透
+    @Value("${pay.notify-url}")
+    String notifyUrl;
+
+    @Value("${pay.alipay.APP_ID}")
+    String APP_ID;
+
+    @Value("${pay.alipay.APP_PRIVATE_KEY}")
+    String APP_PRIVATE_KEY;
+
+    @Value("${pay.alipay.ALIPAY_PUBLIC_KEY}")
+    String ALIPAY_PUBLIC_KEY;
 
     @Override
     @Transactional
@@ -137,4 +165,182 @@ public class OrderServiceImpl implements OrderService {
         return PayRecordMapper.selectOne(new LambdaQueryWrapper<JwbPayRecord>().eq(JwbPayRecord::getPayNo, payNo));
     }
 
+    @Override
+    public PayRecordDto queryPayResult(String payNo) {
+
+        // 1. 调用支付宝接口查询支付结果
+        PayStatusDto payStatusDto = queryPayResultFromAlipay(payNo);
+
+        // 2. 拿到支付结果，更新支付记录表和订单表的状态为 已支付
+        saveAlipayStatus(payStatusDto);
+
+        return null;
+    }
+
+    /**
+     * 调用支付宝接口查询支付结果
+     *
+     * @param payNo 支付记录id
+     * @return 支付记录信息
+     */
+    public PayStatusDto queryPayResultFromAlipay(String payNo) {
+        // 1. 获得初始化的AlipayClient
+        AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.URL, APP_ID, APP_PRIVATE_KEY, "json", AlipayConfig.CHARSET, ALIPAY_PUBLIC_KEY, AlipayConfig.SIGNTYPE);
+        AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+        JSONObject bizContent = new JSONObject();
+        bizContent.put("out_trade_no", payNo);
+        request.setBizContent(bizContent.toString());
+        AlipayTradeQueryResponse response = null;
+        // 2. 请求查询
+        try {
+            response = alipayClient.execute(request);
+        } catch (AlipayApiException e) {
+            JwbException.cast("请求支付宝查询支付结果异常");
+        }
+        // 3. 查询失败
+        if (!response.isSuccess()) {
+            JwbException.cast("请求支付宝查询支付结果异常");
+        }
+        // 4. 查询成功，获取结果集
+        String resultJson = response.getBody();
+        // 4.1 转map
+        Map resultMap = JSON.parseObject(resultJson, Map.class);
+        // 4.2 获取我们需要的信息
+        Map<String, String> alipay_trade_query_response = (Map) resultMap.get("alipay_trade_query_response");
+        // 5. 创建返回对象
+        PayStatusDto payStatusDto = new PayStatusDto();
+        // 6. 封装返回
+        String tradeStatus = alipay_trade_query_response.get("trade_status");
+        String outTradeNo = alipay_trade_query_response.get("out_trade_no");
+        String tradeNo = alipay_trade_query_response.get("trade_no");
+        String totalAmount = alipay_trade_query_response.get("total_amount");
+        payStatusDto.setTrade_status(tradeStatus);
+        payStatusDto.setOut_trade_no(outTradeNo);
+        payStatusDto.setTrade_no(tradeNo);
+        payStatusDto.setTotal_amount(totalAmount);
+        payStatusDto.setApp_id(APP_ID);
+        return payStatusDto;
+    }
+
+    public void saveAlipayStatus(PayStatusDto payStatusDto) {
+        // 1. 获取支付流水号
+        String payNo = payStatusDto.getOut_trade_no();
+        // 2. 查询数据库订单状态
+        JwbPayRecord payRecord = getPayRecordByPayNo(payNo);
+        if (payRecord == null) {
+            JwbException.cast("未找到支付记录");
+        }
+        JwbOrders order = OrdersMapper.selectById(payRecord.getOrderId());
+        if (order == null) {
+            JwbException.cast("找不到相关联的订单");
+        }
+        String statusFromDB = payRecord.getStatus();
+        // 2.1 已支付，直接返回
+        if ("600002".equals(statusFromDB)) {
+            return;
+        }
+        // 3. 查询支付宝交易状态
+        String tradeStatus = payStatusDto.getTrade_status();
+        // 3.1 支付宝交易已成功，保存订单表和交易记录表，更新交易状态
+        if ("TRADE_SUCCESS".equals(tradeStatus)) {
+            // 更新支付交易表
+            payRecord.setStatus("601002");
+            payRecord.setOutPayNo(payStatusDto.getTrade_no());
+            payRecord.setOutPayChannel("Alipay");
+            payRecord.setPaySuccessTime(LocalDateTime.now());
+            int updateRecord = PayRecordMapper.updateById(payRecord);
+            if (updateRecord <= 0) {
+                JwbException.cast("更新支付交易表失败");
+            }
+            // 更新订单表
+            order.setStatus("600002");
+            int updateOrder = OrdersMapper.updateById(order);
+            if (updateOrder <= 0) {
+                JwbException.cast("更新订单表失败");
+            }
+        }
+    }
+
+    @Override
+    public void scanToPay(String payNo, HttpServletResponse response) throws AlipayApiException, IOException {
+        JwbPayRecord payRecord = getPayRecordByPayNo(payNo);
+        if (payRecord == null) {
+            JwbException.cast("请重新点击支付获取二维码");
+        }
+        String status = payRecord.getStatus();
+        if ("601002".equals(status)) {
+            JwbException.cast("订单已支付，请勿重复支付");
+        }
+
+        // 请求支付宝接口进行支付
+        AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.URL, APP_ID, APP_PRIVATE_KEY, AlipayConfig.FORMAT, AlipayConfig.CHARSET, ALIPAY_PUBLIC_KEY, AlipayConfig.SIGNTYPE);
+        AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();//创建API对应的request
+        alipayRequest.setNotifyUrl(notifyUrl);//在公共参数中设置回跳和通知地址
+        alipayRequest.setBizContent("{" +
+                "    \"out_trade_no\":\"" + payRecord.getPayNo() + "\"," +
+                "    \"total_amount\":" + payRecord.getTotalPrice() + "," +
+                "    \"subject\":\"" + payRecord.getOrderName() + "\"," +
+                "    \"product_code\":\"QUICK_WAP_WAY\"" +
+                "  }");//填充业务参数
+        String form = alipayClient.pageExecute(alipayRequest).getBody(); //调用SDK生成表单
+        response.setContentType("text/html;charset=" + AlipayConfig.CHARSET);
+        response.getWriter().write(form);//直接将完整的表单html输出到页面
+        response.getWriter().flush();
+    }
+
+    /**
+     * 交易成功后通过回调地址更新订单表和交易记录表
+     *
+     * @param request
+     * @param response
+     * @throws AlipayApiException
+     * @throws IOException
+     */
+    @Override
+    public void payNotify(HttpServletRequest request, HttpServletResponse response) throws AlipayApiException, IOException {
+        Map<String, String> params = getMap(request);
+        boolean verify_result = AlipaySignature.rsaCheckV1(params, ALIPAY_PUBLIC_KEY, AlipayConfig.CHARSET, "RSA2");
+
+        if (verify_result) {
+            //商户订单号
+            String out_trade_no = new String(request.getParameter("out_trade_no").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+            //支付宝交易号
+            String trade_no = new String(request.getParameter("trade_no").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+            //交易状态
+            String trade_status = new String(request.getParameter("trade_status").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+            //付款金额
+            String total_amount = new String(request.getParameter("total_amount").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+            if (trade_status.equals("TRADE_FINISHED")) {//交易结束
+                log.debug("交易已结束");
+            } else if (trade_status.equals("TRADE_SUCCESS")) {
+                // 交易成功，保存订单信息
+                PayStatusDto payStatusDto = new PayStatusDto();
+                payStatusDto.setOut_trade_no(out_trade_no);
+                payStatusDto.setTrade_no(trade_no);
+                payStatusDto.setApp_id(APP_ID);
+                payStatusDto.setTrade_status(trade_status);
+                payStatusDto.setTotal_amount(total_amount);
+                saveAlipayStatus(payStatusDto);
+                log.debug("交易成功");
+            }
+            response.getWriter().write("success");
+        } else {
+            response.getWriter().write("fail");
+        }
+    }
+
+    private Map<String, String> getMap(HttpServletRequest request) {
+        Map<String, String> params = new HashMap<>();
+        Map<String, String[]> requestParams = request.getParameterMap();
+        for (String name : requestParams.keySet()) {
+            String[] values = (String[]) requestParams.get(name);
+            String valueStr = "";
+            for (int i = 0; i < values.length; i++) {
+                valueStr = (i == values.length - 1) ? valueStr + values[i]
+                        : valueStr + values[i] + ",";
+            }
+            params.put(name, valueStr);
+        }
+        return params;
+    }
 }

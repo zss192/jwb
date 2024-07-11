@@ -670,10 +670,15 @@
                 </div>
             </div>
             <div class="fact-pic">实际支付: <span>￥${model.courseBase.price!''}元</span></div>
+            <#--隐藏支付完成按钮，只用支付成功后回调的被动通知方式 by zss-->
             <div class="go-pay"><a href="#" @click.prevent="wxPay()">微信支付</a><a href="#" @click.prevent="aliPay()">支付宝支付</a><a
+                        href="#"
+                        @click.prevent="startLearngin()">试学</a>
+            </div>
+            <#--<div class="go-pay"><a href="#" @click.prevent="wxPay()">微信支付</a><a href="#" @click.prevent="aliPay()">支付宝支付</a><a
                         href="#" @click.prevent="querypayresult()">支付完成</a><a href="#"
                                                                                   @click.prevent="startLearngin()">试学</a>
-            </div>
+            </div>-->
         </div>
         <!--支付弹窗- end -->
         <div class="popup-comment-box">

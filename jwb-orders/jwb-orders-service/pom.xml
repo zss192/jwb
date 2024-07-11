@@ -95,6 +95,10 @@
             <groupId>com.xuxueli</groupId>
             <artifactId>xxl-job-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -132,5 +132,9 @@ public class OrderServiceImpl implements OrderService {
         return payRecord;
     }
 
+    @Override
+    public JwbPayRecord getPayRecordByPayNo(String payNo) {
+        return PayRecordMapper.selectOne(new LambdaQueryWrapper<JwbPayRecord>().eq(JwbPayRecord::getPayNo, payNo));
+    }
 
 }

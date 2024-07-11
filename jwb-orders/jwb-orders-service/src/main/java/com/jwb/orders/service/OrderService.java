@@ -2,6 +2,7 @@ package com.jwb.orders.service;
 
 import com.jwb.orders.model.dto.AddOrderDto;
 import com.jwb.orders.model.dto.PayRecordDto;
+import com.jwb.orders.model.po.JwbPayRecord;
 
 public interface OrderService {
 
@@ -13,5 +14,12 @@ public interface OrderService {
      * @return 支付交易记录
      */
     PayRecordDto createOrder(String userId, AddOrderDto addOrderDto);
+
+    /**
+     * 查询支付交易记录
+     *
+     * @param payNo 交易记录号
+     */
+    JwbPayRecord getPayRecordByPayNo(String payNo);
 
 }

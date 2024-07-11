@@ -1,6 +1,7 @@
 package com.jwb.orders.service;
 
 import com.alipay.api.AlipayApiException;
+import com.jwb.messagesdk.model.po.MqMessage;
 import com.jwb.orders.model.dto.AddOrderDto;
 import com.jwb.orders.model.dto.PayRecordDto;
 import com.jwb.orders.model.dto.PayStatusDto;
@@ -41,4 +42,11 @@ public interface OrderService {
     void scanToPay(String payNo, HttpServletResponse response) throws AlipayApiException, IOException;
 
     void payNotify(HttpServletRequest request, HttpServletResponse response) throws AlipayApiException, IOException;
+
+    /**
+     * 发送通知结果
+     *
+     * @param mqMessage 消息
+     */
+    void notifyPayResult(MqMessage mqMessage);
 }

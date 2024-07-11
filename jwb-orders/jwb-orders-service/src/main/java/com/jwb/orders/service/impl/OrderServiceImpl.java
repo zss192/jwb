@@ -13,7 +13,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jwb.base.exception.JwbException;
 import com.jwb.base.utils.IdWorkerUtil;
 import com.jwb.base.utils.QRCodeUtil;
+import com.jwb.messagesdk.model.po.MqMessage;
+import com.jwb.messagesdk.service.MqMessageService;
 import com.jwb.orders.config.AlipayConfig;
+import com.jwb.orders.config.PayNotifyConfig;
 import com.jwb.orders.mapper.JwbOrdersGoodsMapper;
 import com.jwb.orders.mapper.JwbOrdersMapper;
 import com.jwb.orders.mapper.JwbPayRecordMapper;
@@ -25,6 +28,11 @@ import com.jwb.orders.model.po.JwbOrdersGoods;
 import com.jwb.orders.model.po.JwbPayRecord;
 import com.jwb.orders.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageDeliveryMode;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +59,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     JwbOrdersGoodsMapper OrdersGoodsMapper;
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    MqMessageService mqMessageService;
 
     @Value("${pay.qrcodeurl}")
     String qrcodeurl;
@@ -259,6 +273,11 @@ public class OrderServiceImpl implements OrderService {
                 JwbException.cast("更新订单表失败");
             }
         }
+
+        // 4. 保存消息记录，参数1：支付结果类型通知；参数2：业务id；参数3：业务类型
+        MqMessage mqMessage = mqMessageService.addMessage("payresult_notify", order.getOutBusinessId(), order.getOrderType(), null);
+        // 5. 发送消息
+        notifyPayResult(mqMessage);
     }
 
     @Override
@@ -342,5 +361,36 @@ public class OrderServiceImpl implements OrderService {
             params.put(name, valueStr);
         }
         return params;
+    }
+
+    /**
+     * 发送通知结果
+     *
+     * @param mqMessage 消息
+     */
+    @Override
+    public void notifyPayResult(MqMessage mqMessage) {
+        // 1. 将消息体转为Json
+        String jsonMsg = JSON.toJSONString(mqMessage);
+        // 2. 设消息的持久化方式为PERSISTENT，即消息会被持久化到磁盘上，确保即使在RabbitMQ服务器重启后也能够恢复消息。
+        Message msgObj = MessageBuilder.withBody(jsonMsg.getBytes()).setDeliveryMode(MessageDeliveryMode.PERSISTENT).build();
+        // 3. 封装CorrelationData，用于跟踪消息的相关信息
+        CorrelationData correlationData = new CorrelationData(mqMessage.getId().toString());
+        // 3.1 添加一个Callback对象，该对象用于在消息确认时处理消息的结果
+        correlationData.getFuture().addCallback(result -> {
+            if (result.isAck()) {
+                // 3.2 消息发送成功，删除消息表中的记录
+                log.debug("消息发送成功：{}", jsonMsg);
+                mqMessageService.completed(mqMessage.getId());
+            } else {
+                // 3.3 消息发送失败
+                log.error("消息发送失败，id：{}，原因：{}", mqMessage.getId(), result.getReason());
+            }
+        }, ex -> {
+            // 3.4 消息异常
+            log.error("消息发送异常，id：{}，原因：{}", mqMessage.getId(), ex.getMessage());
+        });
+        // 4. 发送消息
+        rabbitTemplate.convertAndSend(PayNotifyConfig.PAYNOTIFY_EXCHANGE_FANOUT, "", msgObj, correlationData);
     }
 }

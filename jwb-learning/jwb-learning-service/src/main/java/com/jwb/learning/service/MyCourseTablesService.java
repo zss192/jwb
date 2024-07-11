@@ -20,4 +20,11 @@ public interface MyCourseTablesService {
      * @return 学习资格状态
      */
     JwbCourseTablesDto getLearningStatus(String userId, Long courseId);
+
+    /**
+     * 根据选课id更新选课表支付状态为已支付并插入选课表
+     *
+     * @param chooseCourseId
+     */
+    boolean saveChooseCourseStatus(String chooseCourseId);
 }

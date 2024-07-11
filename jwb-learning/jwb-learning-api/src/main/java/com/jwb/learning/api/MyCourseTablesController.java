@@ -1,5 +1,6 @@
 package com.jwb.learning.api;
 
+import com.jwb.base.exception.JwbException;
 import com.jwb.base.model.PageResult;
 import com.jwb.learning.model.dto.JwbChooseCourseDto;
 import com.jwb.learning.model.dto.JwbCourseTablesDto;
@@ -40,7 +41,13 @@ public class MyCourseTablesController {
     @ApiOperation("我的课程表")
     @GetMapping("/mycoursetable")
     public PageResult<JwbCourseTables> mycoursetable(MyCourseTableParams params) {
-        return null;
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        if (user == null) {
+            JwbException.cast("请登录后查看课程表");
+        }
+        String userId = user.getId();
+        params.setUserId(userId);
+        return myCourseTablesService.myCourseTables(params);
     }
 
 }

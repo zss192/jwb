@@ -51,6 +51,7 @@ public class OrderController {
     }
 
     // 扫码支付后通过回调地址自动请求该接口
+    // TODO：支付成功后前端要手动刷新，优化流程
     @ApiOperation("被动支付通知")
     @PostMapping("/paynotify")
     public void paynotify(HttpServletRequest request, HttpServletResponse response) throws IOException, AlipayApiException {

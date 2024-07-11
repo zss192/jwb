@@ -1,13 +1,16 @@
 package com.jwb.learning.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jwb.base.exception.JwbException;
+import com.jwb.base.model.PageResult;
 import com.jwb.content.model.po.CoursePublish;
 import com.jwb.learning.feignclient.ContentServiceClient;
 import com.jwb.learning.mapper.JwbChooseCourseMapper;
 import com.jwb.learning.mapper.JwbCourseTablesMapper;
 import com.jwb.learning.model.dto.JwbChooseCourseDto;
 import com.jwb.learning.model.dto.JwbCourseTablesDto;
+import com.jwb.learning.model.dto.MyCourseTableParams;
 import com.jwb.learning.model.po.JwbChooseCourse;
 import com.jwb.learning.model.po.JwbCourseTables;
 import com.jwb.learning.service.MyCourseTablesService;
@@ -240,5 +243,25 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
         return true;
     }
 
-
+    @Override
+    public PageResult<JwbCourseTables> myCourseTables(MyCourseTableParams params) {
+        // 1. 获取页码
+        int pageNo = params.getPage();
+        // 2. 设置每页记录数，固定为4
+        long pageSize = 4;
+        // 3. 分页条件
+        Page<JwbCourseTables> page = new Page<>(pageNo, pageSize);
+        // 4. 根据用户id查询课程
+        String userId = params.getUserId();
+        LambdaQueryWrapper<JwbCourseTables> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(JwbCourseTables::getUserId, userId);
+        // 5. 分页查询
+        Page<JwbCourseTables> pageResult = courseTablesMapper.selectPage(page, queryWrapper);
+        // 6. 获取记录总数
+        long total = pageResult.getTotal();
+        // 7. 获取记录
+        List<JwbCourseTables> records = pageResult.getRecords();
+        // 8. 封装返回
+        return new PageResult<>(records, total, pageNo, pageSize);
+    }
 }

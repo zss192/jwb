@@ -26,6 +26,7 @@ public class OrderController {
     @Autowired
     OrderService orderService;
 
+    // TODO：优化流程，前端目前刚开始展示的是没法显示的图片
     @ApiOperation("生成支付二维码")
     @PostMapping("/generatepaycode")
     public PayRecordDto generatePayCode(@RequestBody AddOrderDto addOrderDto) {

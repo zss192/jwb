@@ -239,4 +239,6 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
         addCourseTables(chooseCourse);
         return true;
     }
+
+
 }

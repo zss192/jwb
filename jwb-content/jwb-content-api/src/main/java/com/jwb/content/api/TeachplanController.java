@@ -3,6 +3,7 @@ package com.jwb.content.api;
 import com.jwb.content.model.dto.BindTeachplanMediaDto;
 import com.jwb.content.model.dto.SaveTeachplanDto;
 import com.jwb.content.model.dto.TeachplanDto;
+import com.jwb.content.model.po.Teachplan;
 import com.jwb.content.service.TeachplanService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,5 +54,11 @@ public class TeachplanController {
     @DeleteMapping("/teachplan/association/media/{teachplanId}/{mediaId}")
     public void unassociationMedia(@PathVariable Long teachplanId, @PathVariable String mediaId) {
         teachplanService.unassociationMedia(teachplanId, mediaId);
+    }
+
+    @ApiOperation("课程计划查询")
+    @PostMapping("/teachplan/{teachplanId}")
+    public Teachplan getTeachplan(@PathVariable Long teachplanId) {
+        return teachplanService.getTeachplan(teachplanId);
     }
 }

@@ -3,6 +3,7 @@ package com.jwb.content.service;
 import com.jwb.content.model.dto.BindTeachplanMediaDto;
 import com.jwb.content.model.dto.SaveTeachplanDto;
 import com.jwb.content.model.dto.TeachplanDto;
+import com.jwb.content.model.po.Teachplan;
 
 import java.util.List;
 
@@ -18,4 +19,6 @@ public interface TeachplanService {
     void associationMedia(BindTeachplanMediaDto bindTeachplanMediaDto);
 
     void unassociationMedia(Long teachPlanId, String mediaId);
+
+    Teachplan getTeachplan(Long teachplanId);
 }

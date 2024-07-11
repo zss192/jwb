@@ -211,4 +211,9 @@ public class TeachplanServiceImpl implements TeachplanService {
         int a = teachplanMediaMapper.delete(queryWrapper);
         System.out.println(a);
     }
+
+    @Override
+    public Teachplan getTeachplan(Long teachplanId) {
+        return teachplanMapper.selectById(teachplanId);
+    }
 }

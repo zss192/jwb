@@ -24,7 +24,7 @@ import java.util.Map;
 @Controller
 @Api(value = "支付宝支付接口", tags = "支付宝支付接口")
 public class PayTestController {
-
+    
     @Value("${pay.alipay.APP_ID}")
     String APP_ID;
 

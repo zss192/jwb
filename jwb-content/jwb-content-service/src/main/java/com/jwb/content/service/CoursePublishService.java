@@ -55,10 +55,18 @@ public interface CoursePublishService {
      */
     Boolean saveCourseIndex(Long courseId);
 
+
     /**
      * 根据id获取课程发布信息
      *
      * @param courseId
      */
     CoursePublish getCoursePublish(Long courseId);
+
+    /**
+     * 根据id获取课程发布信息
+     *
+     * @param courseId
+     */
+    CoursePublish getCoursePublishCache(Long courseId);
 }

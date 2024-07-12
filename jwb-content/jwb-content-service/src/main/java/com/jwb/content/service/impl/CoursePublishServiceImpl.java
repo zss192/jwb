@@ -22,12 +22,15 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -36,6 +39,8 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -54,22 +59,30 @@ public class CoursePublishServiceImpl implements CoursePublishService {
     CoursePublishMapper coursePublishMapper;
     // 注入消息SDK
     @Autowired
-    private MqMessageService mqMessageService;
+    MqMessageService mqMessageService;
     @Autowired
     MediaServiceClient mediaServiceClient;
     @Autowired
     SearchServiceClient searchServiceClient;
 
+    @Autowired
+    StringRedisTemplate redisTemplate;
+    @Autowired
+    RedissonClient redissonClient;
+
 
     @Override
     public CoursePreviewDto getCoursePreviewInfo(Long courseId) {
+        //查询课程发布信息 使用redis优化
+        CoursePublish coursePublish = getCoursePublishCache(courseId);
+        CourseBaseInfoDto courseBase = new CourseBaseInfoDto();
+        BeanUtils.copyProperties(coursePublish, courseBase);
+
         CoursePreviewDto coursePreviewDto = new CoursePreviewDto();
-        // 根据课程id查询 课程基本信息、营销信息
-        CourseBaseInfoDto courseBaseInfo = courseBaseService.getCourseBaseInfo(courseId);
         // 根据课程id，查询课程计划
         List<TeachplanDto> teachplanDtos = teachplanService.findTeachplanTree(courseId);
         // 封装返回
-        coursePreviewDto.setCourseBase(courseBaseInfo);
+        coursePreviewDto.setCourseBase(courseBase);
         coursePreviewDto.setTeachplans(teachplanDtos);
         return coursePreviewDto;
     }
@@ -254,8 +267,59 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         return true;
     }
 
+    /**
+     * 直接从数据库查询
+     *
+     * @param courseId
+     */
     @Override
     public CoursePublish getCoursePublish(Long courseId) {
         return coursePublishMapper.selectById(courseId);
     }
+
+    /**
+     * 从redis + redission查询，适用于分布式
+     *
+     * @param courseId
+     */
+    @Override
+    public CoursePublish getCoursePublishCache(Long courseId) {
+        String cacheKey = "course:" + courseId;
+
+        // 从缓存中查询
+        String courseCacheJson = redisTemplate.opsForValue().get(cacheKey);
+        if (StringUtils.isNotEmpty(courseCacheJson)) {
+            log.debug("从缓存中查询");
+            return "null".equals(courseCacheJson) ? null : JSON.parseObject(courseCacheJson, CoursePublish.class);
+        }
+
+        // 加分布式锁防止缓存击穿和缓存雪崩
+        RLock lock = redissonClient.getLock("courseQueryLock" + courseId);
+        lock.lock();
+        try {
+            // 再次从缓存中查询，避免并发时重复查询数据库
+            courseCacheJson = redisTemplate.opsForValue().get(cacheKey);
+            if (StringUtils.isNotEmpty(courseCacheJson)) {
+                log.debug("从缓存中查询");
+                return "null".equals(courseCacheJson) ? null : JSON.parseObject(courseCacheJson, CoursePublish.class);
+            }
+
+            log.debug("缓存中没有，查询数据库");
+            CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+            if (coursePublish == null) {
+                // 缓存空值防止缓存穿透
+                redisTemplate.opsForValue().set(cacheKey, "null", 30 + new Random().nextInt(100), TimeUnit.SECONDS);
+                return null;
+            }
+
+            // 缓存查询结果
+            String jsonString = JSON.toJSONString(coursePublish);
+            // 过期时间加上一个随机值防止缓存雪崩
+            redisTemplate.opsForValue().set(cacheKey, jsonString, 300 + new Random().nextInt(100), TimeUnit.SECONDS);
+            return coursePublish;
+        } finally {
+            lock.unlock();
+        }
+    }
+
 }

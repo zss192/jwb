@@ -3,6 +3,7 @@ package com.jwb.auth.controller;
 import com.jwb.ucenter.model.po.JwbUser;
 import com.jwb.ucenter.service.WxAuthService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,7 @@ public class WxLoginController {
     WxAuthService wxAuthService;
 
     // TODO：使用JustAuth支持更多第三方登录
+    @ApiOperation(value = "微信登录", tags = "微信登录")
     @RequestMapping("/wxLogin")
     public String wxLogin(String code, String state) throws IOException {
         log.debug("微信扫码回调,code:{},state:{}", code, state);

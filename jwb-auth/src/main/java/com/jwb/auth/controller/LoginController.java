@@ -22,13 +22,14 @@ public class LoginController {
     VerifyService verifyService;
 
 
+    @ApiOperation(value = "登录成功", tags = "登录成功")
     @RequestMapping("/login-success")
     public String loginSuccess() {
-
         return "登录成功";
     }
 
 
+    @ApiOperation(value = "获取用户信息", tags = "获取用户信息")
     @RequestMapping("/user/{id}")
     public JwbUser getuser(@PathVariable("id") String id) {
         return jwbUserMapper.selectById(id);

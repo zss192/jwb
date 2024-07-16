@@ -109,6 +109,13 @@
             <artifactId>jwb-base</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <!--JustAuth第三方登录-->
+        <dependency>
+            <groupId>me.zhyd.oauth</groupId>
+            <artifactId>JustAuth</artifactId>
+            <version>1.16.6</version>
+        </dependency>
+
     </dependencies>
 
 

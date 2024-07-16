@@ -29,7 +29,7 @@ public class JwbUser implements Serializable {
 
     private String name;
     private String nickname;
-    private String wxUnionid;
+    private String thirdUnionid;
     private String companyId;
     /**
      * 头像
@@ -47,6 +47,8 @@ public class JwbUser implements Serializable {
     private String cellphone;
 
     private String qq;
+
+    private String source;
 
     /**
      * 用户状态

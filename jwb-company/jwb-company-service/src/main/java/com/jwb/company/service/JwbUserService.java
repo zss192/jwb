@@ -13,4 +13,6 @@ import com.jwb.company.model.po.JwbUser;
 public interface JwbUserService extends IService<JwbUser> {
 
     PageResult<JwbUser> listMember(PageParams pageParams, Long companyId, String name, String cellphone, String status);
+
+    void changeStatus(String id, String status);
 }

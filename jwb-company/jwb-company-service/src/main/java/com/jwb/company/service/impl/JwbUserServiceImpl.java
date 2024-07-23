@@ -46,6 +46,13 @@ public class JwbUserServiceImpl extends ServiceImpl<JwbUserMapper, JwbUser>
         // 构建结果集
         return new PageResult<>(list, total, pageParams.getPageNo(), pageParams.getPageSize());
     }
+
+    @Override
+    public void changeStatus(String id, String status) {
+        JwbUser jwbUser = jwbUserMapper.selectById(id);
+        jwbUser.setStatus(status);
+        jwbUserMapper.updateById(jwbUser);
+    }
 }
 
 

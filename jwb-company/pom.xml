@@ -19,5 +19,10 @@
         <module>jwb-company-model</module>
     </modules>
     <dependencies>
+        <dependency>
+            <groupId>com.jwb</groupId>
+            <artifactId>jwb-base</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

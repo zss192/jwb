@@ -7,6 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +20,6 @@ public class CompanyController {
     @Autowired
     JwbCompanyService companyService;
 
-
     @GetMapping("/my-company")
     @ApiOperation("查询机构资料")
     public JwbCompany queryCompany() {
@@ -27,6 +27,7 @@ public class CompanyController {
         return companyService.queryCompany(companyId);
     }
 
+    @PreAuthorize("hasAuthority('jwb_sysmanager_company')")
     @PutMapping("/company")
     @ApiOperation("修改机构资料")
     public void queryCompany(@RequestBody EditCompanyDto editCompanyDto) {

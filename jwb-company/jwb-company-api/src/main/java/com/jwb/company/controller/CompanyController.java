@@ -44,6 +44,7 @@ public class CompanyController {
         return userService.listMember(pageParams, companyId, name, cellphone, status);
     }
 
+    // TODO：封禁的用户禁止登录并且立马清除其jwt
     @PutMapping("/member/status/{id}/{status}")
     @ApiOperation("更改成员状态")
     public void changeStatus(@PathVariable String id, @PathVariable String status) {

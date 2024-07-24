@@ -4,18 +4,16 @@ import com.jwb.messagesdk.model.po.MqMessage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Mr.M
  * @version 1.0
- * @description 消息处理抽象类
- * @date 2022/9/21 19:44
  */
 @Slf4j
 @Data
@@ -24,13 +22,15 @@ public abstract class MessageProcessAbstract {
     @Autowired
     MqMessageService mqMessageService;
 
+    @Autowired
+    @Qualifier("threadPoolExecutor")
+    private ExecutorService threadPool;
+
 
     /**
      * @param mqMessage 执行任务内容
      * @return boolean true:处理成功，false处理失败
      * @description 任务处理
-     * @author Mr.M
-     * @date 2022/9/21 19:47
      */
     public abstract boolean execute(MqMessage mqMessage);
 
@@ -43,8 +43,6 @@ public abstract class MessageProcessAbstract {
      * @param timeout     预估任务执行时间,到此时间如果任务还没有结束则强制结束 单位秒
      * @return void
      * @description 扫描消息表多线程执行任务
-     * @author Mr.M
-     * @date 2022/9/21 20:35
      */
     public void process(int shardIndex, int shardTotal, String messageType, int count, long timeout) {
 
@@ -58,8 +56,6 @@ public abstract class MessageProcessAbstract {
                 return;
             }
 
-            //创建线程池
-            ExecutorService threadPool = Executors.newFixedThreadPool(size);
             //计数器
             CountDownLatch countDownLatch = new CountDownLatch(size);
             messageList.forEach(message -> {
@@ -89,17 +85,11 @@ public abstract class MessageProcessAbstract {
 
                 });
             });
-
             //等待,给一个充裕的超时时间,防止无限等待，到达超时时间还没有处理完成则结束任务
             countDownLatch.await(timeout, TimeUnit.SECONDS);
             System.out.println("结束....");
         } catch (InterruptedException e) {
             e.printStackTrace();
-
         }
-
-
     }
-
-
 }

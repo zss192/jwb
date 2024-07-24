@@ -124,8 +124,8 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         coursePublishPre.setTeachplan(JSON.toJSONString(teachplanTree));
         coursePublishPre.setCompanyId(companyId);
         coursePublishPre.setCreateDate(LocalDateTime.now());
-        // 3. 设置预发布记录状态为已提交
-        coursePublishPre.setStatus("202003");
+        // 3. 设置预发布记录状态为审核通过（暂时跳过审核直接审核通过）
+        coursePublishPre.setStatus("202004");
         // 判断是否已经存在预发布记录，若存在，则更新
         CoursePublishPre coursePublishPreUpdate = coursePublishPreMapper.selectById(courseId);
         if (coursePublishPreUpdate == null) {
@@ -133,8 +133,8 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         } else {
             coursePublishPreMapper.updateById(coursePublishPre);
         }
-        // 4. 设置课程基本信息审核状态为已提交
-        courseBase.setAuditStatus("202003");
+        // 4. 设置课程基本信息审核状态为审核通过（暂时跳过审核直接审核通过）
+        courseBase.setAuditStatus("202004");
         courseBaseMapper.updateById(courseBase);
     }
 

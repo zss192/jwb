@@ -187,6 +187,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         // 更新课程基本信息表的发布状态为已发布
         CourseBase courseBase = courseBaseMapper.selectById(courseId);
         courseBase.setAuditStatus("203002");
+        courseBase.setStatus("203002");
         courseBaseMapper.updateById(courseBase);
 
         // 信息同步更新到Redis 先更新后删除

@@ -2,6 +2,8 @@ package com.jwb.content.model.po;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,6 +14,8 @@ import java.time.LocalDateTime;
  * @author makejava
  * @since 2024-06-10 18:41:29
  */
+@Setter
+@Getter
 public class CourseBase implements Serializable {
     private static final long serialVersionUID = 307434593195492524L;
     /**
@@ -64,6 +68,10 @@ public class CourseBase implements Serializable {
      */
     private String pic;
     /**
+     * 课程图片
+     */
+    private String charge;
+    /**
      * 创建时间
      */
     private LocalDateTime createDate;
@@ -88,150 +96,6 @@ public class CourseBase implements Serializable {
      */
     private String status;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUsers() {
-        return users;
-    }
-
-    public void setUsers(String users) {
-        this.users = users;
-    }
-
-    public String getTags() {
-        return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
-    }
-
-    public String getMt() {
-        return mt;
-    }
-
-    public void setMt(String mt) {
-        this.mt = mt;
-    }
-
-    public String getSt() {
-        return st;
-    }
-
-    public void setSt(String st) {
-        this.st = st;
-    }
-
-    public String getGrade() {
-        return grade;
-    }
-
-    public void setGrade(String grade) {
-        this.grade = grade;
-    }
-
-    public String getTeachmode() {
-        return teachmode;
-    }
-
-    public void setTeachmode(String teachmode) {
-        this.teachmode = teachmode;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPic() {
-        return pic;
-    }
-
-    public void setPic(String pic) {
-        this.pic = pic;
-    }
-
-    public LocalDateTime getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(LocalDateTime createDate) {
-        this.createDate = createDate;
-    }
-
-    public LocalDateTime getChangeDate() {
-        return changeDate;
-    }
-
-    public void setChangeDate(LocalDateTime changeDate) {
-        this.changeDate = changeDate;
-    }
-
-    public String getCreatePeople() {
-        return createPeople;
-    }
-
-    public void setCreatePeople(String createPeople) {
-        this.createPeople = createPeople;
-    }
-
-    public String getChangePeople() {
-        return changePeople;
-    }
-
-    public void setChangePeople(String changePeople) {
-        this.changePeople = changePeople;
-    }
-
-    public String getAuditStatus() {
-        return auditStatus;
-    }
-
-    public void setAuditStatus(String auditStatus) {
-        this.auditStatus = auditStatus;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
 }
 

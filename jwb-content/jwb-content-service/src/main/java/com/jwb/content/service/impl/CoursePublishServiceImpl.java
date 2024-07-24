@@ -188,6 +188,10 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         CourseBase courseBase = courseBaseMapper.selectById(courseId);
         courseBase.setAuditStatus("203002");
         courseBaseMapper.updateById(courseBase);
+
+        // 信息同步更新到Redis 先更新后删除
+        String cacheKey = "course:" + courseId;
+        redisTemplate.delete(cacheKey);
     }
 
     /**

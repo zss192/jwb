@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -38,7 +39,7 @@ public class JwbUser implements Serializable {
 
     private String utype;
 
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
     private String sex;
 

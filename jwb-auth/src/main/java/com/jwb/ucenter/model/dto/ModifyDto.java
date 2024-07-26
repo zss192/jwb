@@ -16,7 +16,9 @@ public class ModifyDto {
 
     String email;
 
-    String name;
+    String username;
+
+    String nickname;
 
     String userpic;
 

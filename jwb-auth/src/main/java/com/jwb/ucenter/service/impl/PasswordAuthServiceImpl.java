@@ -7,11 +7,12 @@ import com.jwb.ucenter.model.dto.AuthParamsDto;
 import com.jwb.ucenter.model.dto.JwbUserExt;
 import com.jwb.ucenter.model.po.JwbUser;
 import com.jwb.ucenter.service.AuthService;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service("password_authservice")
 public class PasswordAuthServiceImpl implements AuthService {
@@ -28,7 +29,7 @@ public class PasswordAuthServiceImpl implements AuthService {
     @Override
     public JwbUserExt execute(AuthParamsDto authParamsDto) {
         // 校验验证码
-        String checkcode = authParamsDto.getCheckcode();
+        /*String checkcode = authParamsDto.getCheckcode();
         String checkcodekey = authParamsDto.getCheckcodekey();
         if (StringUtils.isBlank(checkcode) || StringUtils.isBlank(checkcodekey)) {
             throw new RuntimeException("验证码为空");
@@ -36,12 +37,13 @@ public class PasswordAuthServiceImpl implements AuthService {
         Boolean verify = checkCodeClient.verify(checkcodekey, checkcode);
         if (!verify) {
             throw new RuntimeException("验证码输入错误");
-        }
+        }*/
 
-        // 1. 获取账号
+        // 1. 获取账号或邮箱
         String username = authParamsDto.getUsername();
         // 2. 根据账号去数据库中查询是否存在
-        JwbUser jwbUser = jwbUserMapper.selectOne(new LambdaQueryWrapper<JwbUser>().eq(JwbUser::getUsername, username));
+        JwbUser jwbUser = jwbUserMapper.selectOne(new LambdaQueryWrapper<JwbUser>().eq(JwbUser::getUsername, username).or()
+                .eq(JwbUser::getEmail, username));
         // 3. 不存在抛异常 为了安全考虑不提示账号不存在
         if (jwbUser == null) {
             throw new RuntimeException("账号或密码错误");
@@ -57,6 +59,9 @@ public class PasswordAuthServiceImpl implements AuthService {
         if (!matches) {
             throw new RuntimeException("账号或密码错误");
         }
+        // 4.6 更新登录时间
+        jwbUser.setUpdateTime(LocalDateTime.now());
+        jwbUserMapper.updateById(jwbUser);
         // 4.5 匹配，封装返回
         JwbUserExt jwbUserExt = new JwbUserExt();
         BeanUtils.copyProperties(jwbUser, jwbUserExt);

@@ -36,6 +36,7 @@ public class VerifyServiceImpl implements VerifyService {
 
 
     @Override
+    @Transactional
     public void findPassword(FindPswDto findPswDto) {
         String email = findPswDto.getEmail();
         String checkcode = findPswDto.getCheckcode();
@@ -54,7 +55,6 @@ public class VerifyServiceImpl implements VerifyService {
         if (!password.equals(confirmpwd)) {
             throw new RuntimeException("两次输入的密码不一致");
         }
-        redisTemplate.delete(email);
 
         LambdaQueryWrapper<JwbUser> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(JwbUser::getEmail, findPswDto.getEmail());
@@ -64,6 +64,7 @@ public class VerifyServiceImpl implements VerifyService {
         }
         user.setPassword(new BCryptPasswordEncoder().encode(password));
         userMapper.updateById(user);
+        redisTemplate.delete(email);
     }
 
     @Override
@@ -94,13 +95,18 @@ public class VerifyServiceImpl implements VerifyService {
         if (user != null) {
             throw new RuntimeException("用户已存在，一个邮箱只能注册一个账号");
         }
+        lambdaQueryWrapper.eq(JwbUser::getUsername, registerDto.getUsername());
+        user = userMapper.selectOne(lambdaQueryWrapper);
+        if (user != null) {
+            throw new RuntimeException("账号已存在，不允许重复");
+        }
         JwbUser jwbUser = new JwbUser();
         BeanUtils.copyProperties(registerDto, jwbUser);
         jwbUser.setPassword(new BCryptPasswordEncoder().encode(password));
         jwbUser.setId(uuid);
         jwbUser.setUtype("101001");  // 学生类型
         jwbUser.setStatus("1");
-        jwbUser.setName(registerDto.getNickname());
+        jwbUser.setNickname(registerDto.getUsername());
         jwbUser.setCreateTime(LocalDateTime.now());
         int insert = userMapper.insert(jwbUser);
         if (insert <= 0) {

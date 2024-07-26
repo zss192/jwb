@@ -132,7 +132,6 @@ public class UserServiceImpl implements UserService, AuthService {
         jwbUser.setThirdUnionid(unionid);
         jwbUser.setNickname(user.getNickname());
         jwbUser.setUserpic(user.getAvatar());
-        jwbUser.setName(user.getNickname());
         jwbUser.setSource(user.getSource());
         jwbUser.setUtype("101001");  // 学生类型
         jwbUser.setStatus("1");
@@ -230,6 +229,10 @@ public class UserServiceImpl implements UserService, AuthService {
         if (user == null) {
             throw new RuntimeException("账号不存在");
         }
+        // 更新登录时间
+        user.setUpdateTime(LocalDateTime.now());
+        jwbUserMapper.updateById(user);
+        
         JwbUserExt jwbUserExt = new JwbUserExt();
         BeanUtils.copyProperties(user, jwbUserExt);
         return jwbUserExt;

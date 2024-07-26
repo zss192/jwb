@@ -3,7 +3,8 @@ package com.jwb.content.model.po;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -14,7 +15,8 @@ import java.time.LocalDateTime;
  * @author makejava
  * @since 2024-06-10 18:41:30
  */
-@Data
+@Getter
+@Setter
 public class CourseTeacher implements Serializable {
     private static final long serialVersionUID = -13892189285468110L;
     /**
@@ -42,6 +44,10 @@ public class CourseTeacher implements Serializable {
      * 照片
      */
     private String photograph;
+    /**
+     * 学习人数
+     */
+    private Long count;
     /**
      * 创建时间
      */

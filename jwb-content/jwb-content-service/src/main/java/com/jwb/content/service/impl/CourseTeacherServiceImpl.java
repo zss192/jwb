@@ -29,6 +29,14 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
         return courseTeachers;
     }
 
+    @Override
+    public List<CourseTeacher> getCourseTeacherRank() {
+        LambdaQueryWrapper<CourseTeacher> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(CourseTeacher::getCount);
+        queryWrapper.last("limit 5");
+        return courseTeacherMapper.selectList(queryWrapper);
+    }
+
     @Transactional
     @Override
     public CourseTeacher saveCourseTeacher(CourseTeacher courseTeacher) {

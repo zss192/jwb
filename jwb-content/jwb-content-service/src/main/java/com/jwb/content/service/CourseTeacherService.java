@@ -7,6 +7,8 @@ import java.util.List;
 public interface CourseTeacherService {
     List<CourseTeacher> getCourseTeacherList(Long courseId);
 
+    List<CourseTeacher> getCourseTeacherRank();
+
     CourseTeacher saveCourseTeacher(CourseTeacher courseTeacher);
 
     void deleteCourseTeacher(Long courseId, Long teacherId);

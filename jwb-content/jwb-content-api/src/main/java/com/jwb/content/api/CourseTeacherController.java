@@ -23,6 +23,12 @@ public class CourseTeacherController {
         return courseTeacherService.getCourseTeacherList(courseId);
     }
 
+    @ApiOperation("查询教师排行信息接口")
+    @GetMapping("/courseTeacher/list")
+    public List<CourseTeacher> getCourseTeacherRank() {
+        return courseTeacherService.getCourseTeacherRank();
+    }
+
     @ApiOperation("添加/修改教师信息接口")
     @PostMapping("/courseTeacher")
     public CourseTeacher saveCourseTeacher(@RequestBody CourseTeacher courseTeacher) {

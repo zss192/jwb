@@ -1,6 +1,7 @@
 package com.jwb.auth.controller;
 
 import com.jwb.ucenter.model.dto.ModifyDto;
+import com.jwb.ucenter.model.dto.ModifyPasswordDto;
 import com.jwb.ucenter.service.UserInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,5 +26,11 @@ public class UserInfoController {
     @PostMapping("/modify")
     public void modify(@RequestBody ModifyDto modifyDto) {
         userInfoService.modify(modifyDto);
+    }
+
+    @ApiOperation(value = "修改用户密码", tags = "修改用户密码")
+    @PostMapping("/modifyPassword")
+    public void modify(@RequestBody ModifyPasswordDto modifyPasswordDto) {
+        userInfoService.modifyPassword(modifyPasswordDto);
     }
 }

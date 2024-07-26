@@ -129,6 +129,7 @@ public class UserServiceImpl implements UserService, AuthService {
         // 2.4 设置其他数据库非空约束的属性
         jwbUser.setUsername(unionid);
         // TODO：弹框让绑定手机号并设置密码，参考：https://www.fotor.com.cn/
+        jwbUser.setPassword(unionid);
         jwbUser.setThirdUnionid(unionid);
         jwbUser.setNickname(user.getNickname());
         jwbUser.setUserpic(user.getAvatar());
@@ -232,7 +233,7 @@ public class UserServiceImpl implements UserService, AuthService {
         // 更新登录时间
         user.setUpdateTime(LocalDateTime.now());
         jwbUserMapper.updateById(user);
-        
+
         JwbUserExt jwbUserExt = new JwbUserExt();
         BeanUtils.copyProperties(user, jwbUserExt);
         return jwbUserExt;

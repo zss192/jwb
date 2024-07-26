@@ -24,5 +24,7 @@ public class ModifyDto {
 
     String sex;
 
+    String source;
+
     LocalDate birthday;
 }

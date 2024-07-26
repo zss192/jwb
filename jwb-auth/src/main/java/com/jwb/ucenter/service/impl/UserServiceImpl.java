@@ -129,7 +129,6 @@ public class UserServiceImpl implements UserService, AuthService {
         // 2.4 设置其他数据库非空约束的属性
         jwbUser.setUsername(unionid);
         // TODO：弹框让绑定手机号并设置密码，参考：https://www.fotor.com.cn/
-        jwbUser.setPassword(unionid);
         jwbUser.setThirdUnionid(unionid);
         jwbUser.setNickname(user.getNickname());
         jwbUser.setUserpic(user.getAvatar());
@@ -137,6 +136,7 @@ public class UserServiceImpl implements UserService, AuthService {
         jwbUser.setSource(user.getSource());
         jwbUser.setUtype("101001");  // 学生类型
         jwbUser.setStatus("1");
+        jwbUser.setCompanyId("1232141425");
         jwbUser.setCreateTime(LocalDateTime.now());
         // 2.5 添加到数据库
         jwbUserMapper.insert(jwbUser);
@@ -165,7 +165,7 @@ public class UserServiceImpl implements UserService, AuthService {
                         .clientId(github_id)
                         .clientSecret(github_secret)
                         .redirectUri(redirectUrl + "github")
-                        .scopes(AuthScopeUtils.getScopes(AuthGithubScope.values()))
+                        .scopes(AuthScopeUtils.getScopes(AuthGithubScope.READ_USER))
                         // 针对国外平台配置代理
                         .httpConfig(HttpConfig.builder()
                                 .timeout(15000)

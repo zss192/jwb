@@ -61,7 +61,7 @@ public class RestAuthController {
                 return "redirect:http://localhost/error.html";
             }
             String username = user.getUuid();
-            return "redirect:http://www.51xuecheng.cn/sign.html?username=" + username + "&authType=user";
+            return "redirect:http://www.jiwangbang.top/sign.html?username=" + username + "&authType=user";
 
         }
         return "redirect:http://localhost/error.html";

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * @author zss
@@ -49,16 +50,22 @@ public class MediaFilesController {
         UploadFileParamsDto uploadFileParamsDto = new UploadFileParamsDto();
         uploadFileParamsDto.setFileSize(upload.getSize());
         String contentType = upload.getContentType();
-        // 其他
         if (contentType != null && contentType.contains("image")) {
             // 图片
             uploadFileParamsDto.setFileType("001001");
+            uploadFileParamsDto.setTags("课程图片");
+        } else if (Objects.equals(folder, "course") && objectName.endsWith(".html")) {
+            // 静态页面
+            uploadFileParamsDto.setFileType("001003");
+            uploadFileParamsDto.setTags("静态页面");
+            uploadFileParamsDto.setUrl("/mediafiles/" + folder + "/" + objectName);
         }
-        uploadFileParamsDto.setFilename(upload.getOriginalFilename());
+        if (objectName != null) {
+            uploadFileParamsDto.setFilename(objectName);
+        } else {
+            uploadFileParamsDto.setFilename(upload.getOriginalFilename());
+        }
         uploadFileParamsDto.setContentType(contentType);
-        // TODO:定时任务上传到minio时，如修改课程导致重传html 无法获取当前登录用户
-        /*SecurityUtil.JwbUser user = SecurityUtil.getUser();
-        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;*/
         Long companyId = 1232141425L;
         try {
             return mediaFileService.uploadFile(companyId, uploadFileParamsDto, upload.getBytes(), folder, objectName);

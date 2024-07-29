@@ -40,4 +40,9 @@ public class UploadFileParamsDto {
      * 备注
      */
     private String remark;
+
+    /**
+     * 备注
+     */
+    private String url;
 }

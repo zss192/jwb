@@ -3,10 +3,7 @@ package com.jwb.learning.feignclient;
 import com.jwb.content.model.po.CoursePublish;
 import com.jwb.content.model.po.Teachplan;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @description 内容管理远程接口
@@ -20,4 +17,7 @@ public interface ContentServiceClient {
 
     @PostMapping("/content/teachplan/{teachplanId}")
     Teachplan getTeachplan(@PathVariable("teachplanId") Long teachplanId);
+
+    @PutMapping("/content/course/addStudyCount/{courseId}")
+    void addStudyCount(@PathVariable("courseId") Long courseId);
 }

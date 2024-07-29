@@ -69,8 +69,11 @@
 
                     </a>
                 </p>
-                <p class="vid-act"><span> <i class="i-heart"></i>收藏 23 </span> <span>分享 <i class="i-weixin"></i><i
-                                class="i-qq"></i></span></p>
+                <p class="vid-act">
+                    <span> <i class="i-heart"></i>收藏 23 </span>
+                    <span> <i class="i-heart"></i>${model.courseBase.studyCount} 人在学 </span>
+                    <span>分享 <i class="i-weixin"></i><i class="i-qq"></i></span>
+                </p>
             </div>
         </div>
     </div>

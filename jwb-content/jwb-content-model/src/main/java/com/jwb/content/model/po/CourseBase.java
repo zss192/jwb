@@ -72,6 +72,10 @@ public class CourseBase implements Serializable {
      */
     private String charge;
     /**
+     * 学习人数
+     */
+    private Long studyCount;
+    /**
      * 创建时间
      */
     private LocalDateTime createDate;

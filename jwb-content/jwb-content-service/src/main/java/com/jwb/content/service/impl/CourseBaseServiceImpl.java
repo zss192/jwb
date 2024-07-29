@@ -155,6 +155,8 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         BeanUtils.copyProperties(editCourseDto, courseBase);
         // 更新，设置更新时间
         courseBase.setChangeDate(LocalDateTime.now());
+        courseBase.setAuditStatus("202002"); // 未提交
+        courseBase.setStatus("203001"); // 未发布
         courseBaseMapper.updateById(courseBase);
         // 查询课程营销信息
         CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
@@ -204,6 +206,13 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         courseMarketMapper.deleteById(courseId);
         // 删除课程基本信息
         courseBaseMapper.deleteById(courseId);
+    }
+
+    @Override
+    public void addStudyCount(Long companyId, Long courseId) {
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        courseBase.setStudyCount(courseBase.getStudyCount() + 1);
+        courseBaseMapper.updateById(courseBase);
     }
 }
 

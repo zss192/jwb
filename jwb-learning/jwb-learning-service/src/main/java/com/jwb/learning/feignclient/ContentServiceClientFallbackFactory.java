@@ -24,6 +24,11 @@ public class ContentServiceClientFallbackFactory implements FallbackFactory<Cont
                 log.error("调用内容管理服务查询教学计划发生熔断:{}", throwable.toString(), throwable);
                 return null;
             }
+
+            @Override
+            public void addStudyCount(Long courseId) {
+                log.error("调用内容管理服务查询教学计划发生熔断:{}", throwable.toString(), throwable);
+            }
         };
     }
 }

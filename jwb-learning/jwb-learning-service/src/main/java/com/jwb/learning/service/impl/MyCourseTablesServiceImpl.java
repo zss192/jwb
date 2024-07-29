@@ -89,6 +89,8 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
         if (insert <= 0) {
             JwbException.cast("添加我的课程表失败");
         }
+        // 课程学习人数加1
+        contentServiceClient.addStudyCount(courseTables.getCourseId());
         return courseTables;
     }
 
@@ -158,7 +160,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
                 .eq(JwbChooseCourse::getUserId, userId)
                 .eq(JwbChooseCourse::getCourseId, coursePublish.getId())
                 .eq(JwbChooseCourse::getOrderType, "700001")  // 免费课程
-                .eq(JwbChooseCourse::getStatus, "701007");// 选课成功
+                .eq(JwbChooseCourse::getStatus, "701001");// 选课成功
         // 1.1 由于可能存在多条，所以这里用selectList
         List<JwbChooseCourse> chooseCourses = chooseCourseMapper.selectList(lambdaQueryWrapper);
         // 1.2 如果已经存在对应的选课数据，返回一条即可

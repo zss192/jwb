@@ -18,6 +18,7 @@
         <result property="description" column="description" jdbcType="VARCHAR"/>
         <result property="pic" column="pic" jdbcType="VARCHAR"/>
         <result property="charge" column="charge" jdbcType="VARCHAR"/>
+        <result property="studyCount" column="study_count" jdbcType="BIGINT"/>
         <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
         <result property="changeDate" column="change_date" jdbcType="TIMESTAMP"/>
         <result property="createPeople" column="create_people" jdbcType="VARCHAR"/>

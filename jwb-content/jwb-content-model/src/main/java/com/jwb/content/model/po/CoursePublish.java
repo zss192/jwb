@@ -132,6 +132,9 @@ public class CoursePublish implements Serializable {
      */
     private Integer validDays;
 
-
+    /**
+     * 课程学习人数
+     */
+    private Long studyCount;
 }
 

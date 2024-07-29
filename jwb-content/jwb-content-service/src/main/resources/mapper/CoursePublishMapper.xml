@@ -32,6 +32,7 @@
         <result property="price" column="price" jdbcType="FLOAT"/>
         <result property="original_price" column="original_price" jdbcType="FLOAT"/>
         <result property="valid_days" column="valid_days" jdbcType="INTEGER"/>
+        <result property="studyCount" column="study_count" jdbcType="BIGINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">

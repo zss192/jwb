@@ -88,4 +88,6 @@ public interface MediaFileService {
     String getFilePathByMd5(String fileMd5, String extension);
 
     void addMediaFilesToMinIO(String filePath, String bucket, String objectName);
+
+    void deleteFile(String mediaId);
 }

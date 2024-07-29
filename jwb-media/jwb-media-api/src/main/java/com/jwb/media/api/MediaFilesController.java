@@ -74,4 +74,10 @@ public class MediaFilesController {
         MediaFiles mediaFile = mediaFileService.getFileById(mediaId);
         return RestResponse.success(mediaFile.getUrl());
     }
+
+    @ApiOperation(value = "删除文件")
+    @DeleteMapping("/{mediaId}")
+    public void deleteFile(@PathVariable String mediaId) {
+        mediaFileService.deleteFile(mediaId);
+    }
 }

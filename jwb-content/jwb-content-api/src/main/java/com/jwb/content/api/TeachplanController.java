@@ -61,4 +61,10 @@ public class TeachplanController {
     public Teachplan getTeachplan(@PathVariable Long teachplanId) {
         return teachplanService.getTeachplan(teachplanId);
     }
+
+    @ApiOperation("课程计划绑定文件查询")
+    @GetMapping("/teachplan/ifExistMedia/{mediaId}")
+    public Boolean ifExistMedia(@PathVariable String mediaId) {
+        return teachplanService.ifExistMedia(mediaId);
+    }
 }

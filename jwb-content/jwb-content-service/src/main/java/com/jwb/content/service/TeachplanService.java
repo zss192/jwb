@@ -21,4 +21,6 @@ public interface TeachplanService {
     void unassociationMedia(Long teachPlanId, String mediaId);
 
     Teachplan getTeachplan(Long teachplanId);
+
+    Boolean ifExistMedia(String mediaId);
 }

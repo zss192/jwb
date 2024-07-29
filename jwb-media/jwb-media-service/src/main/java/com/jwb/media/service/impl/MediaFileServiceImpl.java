@@ -8,6 +8,7 @@ import com.jwb.base.exception.JwbException;
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
 import com.jwb.base.model.RestResponse;
+import com.jwb.media.feignclient.TeachplanClient;
 import com.jwb.media.mapper.MediaFilesMapper;
 import com.jwb.media.mapper.MediaProcessMapper;
 import com.jwb.media.model.dto.QueryMediaParamsDto;
@@ -16,10 +17,8 @@ import com.jwb.media.model.dto.UploadFileResultDto;
 import com.jwb.media.model.po.MediaFiles;
 import com.jwb.media.model.po.MediaProcess;
 import com.jwb.media.service.MediaFileService;
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.UploadObjectArgs;
+import io.minio.*;
+import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.BeanUtils;
@@ -37,6 +36,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author zss
@@ -54,6 +54,8 @@ public class MediaFileServiceImpl implements MediaFileService {
     MediaFileService currentProxy; // 构建一个当前类的代理对象
     @Autowired
     MediaProcessMapper mediaProcessMapper;
+    @Autowired
+    TeachplanClient teachplanClient;
 
     @Value("${minio.bucket.files}")
     private String bucket_files;
@@ -242,6 +244,61 @@ public class MediaFileServiceImpl implements MediaFileService {
         } catch (Exception e) {
             log.error("上传到文件系统出错:{}", e.getMessage());
             JwbException.cast("上传到文件系统出错");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteFile(String mediaId) {
+        Boolean ifExist = teachplanClient.ifExistMedia(mediaId);
+        if (ifExist) {
+            JwbException.cast("有关联的课程无法删除");
+        }
+
+        MediaFiles mediaFiles = mediaFilesMapper.selectById(mediaId);
+        // 删除数据库中的文件信息
+        mediaFilesMapper.deleteById(mediaId);
+        // 删除MinIO中的文件
+        if (mediaFiles == null) {
+            JwbException.cast("文件不存在");
+        }
+        String bucket = mediaFiles.getBucket();
+        String filePath = mediaFiles.getFilePath();
+        // 不是视频文件则直接删除
+        try {
+            minioClient.removeObject(RemoveObjectArgs.builder()
+                    .bucket(bucket)
+                    .object(filePath)
+                    .build());
+        } catch (Exception e) {
+            log.error("删除MinIO中的文件出错: {}", e.getMessage());
+            JwbException.cast("删除MinIO中的文件出错");
+        }
+        if (!Objects.equals(mediaFiles.getFileType(), "001002")) {
+            return;
+        }
+        // 是视频文件则删除视频文件和分块文件
+        try {
+            // 取出filePath中的路径
+            filePath = filePath.substring(0, filePath.lastIndexOf("/") + 1) + "chunk/";
+            // 获取目录下的所有对象
+            Iterable<Result<Item>> objects = minioClient.listObjects(
+                    ListObjectsArgs.builder()
+                            .bucket(bucket)
+                            .prefix(filePath)
+                            .build()
+            );
+            for (Result<Item> result : objects) {
+                Item item = result.get();
+                String objectName = item.objectName();
+                minioClient.removeObject(RemoveObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(objectName)
+                        .build());
+            }
+        } catch (Exception e) {
+            log.error("删除MinIO中的文件出错: {}", e.getMessage());
+            JwbException.cast("删除MinIO中的文件出错");
         }
     }
 

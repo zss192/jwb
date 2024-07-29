@@ -2,73 +2,66 @@ package com.jwb.content.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jwb.base.exception.JwbException;
+import com.jwb.content.feignclient.TeacherServiceClient;
 import com.jwb.content.mapper.CourseTeacherMapper;
 import com.jwb.content.model.po.CourseTeacher;
+import com.jwb.content.model.po.JwbTeacher;
 import com.jwb.content.service.CourseTeacherService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @Service
 public class CourseTeacherServiceImpl implements CourseTeacherService {
     @Autowired
     private CourseTeacherMapper courseTeacherMapper;
+    @Autowired
+    TeacherServiceClient teacherServiceClient;
+
 
     @Override
-    public List<CourseTeacher> getCourseTeacherList(Long courseId) {
-        // SELECT * FROM course_teacher WHERE course_id = 117
+    public JwbTeacher getCourseTeacherList(Long courseId) {
         LambdaQueryWrapper<CourseTeacher> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(CourseTeacher::getCourseId, courseId);
-        List<CourseTeacher> courseTeachers = courseTeacherMapper.selectList(queryWrapper);
-        return courseTeachers;
-    }
-
-    @Override
-    public List<CourseTeacher> getCourseTeacherRank() {
-        LambdaQueryWrapper<CourseTeacher> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.orderByDesc(CourseTeacher::getCount);
-        queryWrapper.last("limit 5");
-        return courseTeacherMapper.selectList(queryWrapper);
-    }
-
-    @Transactional
-    @Override
-    public CourseTeacher saveCourseTeacher(CourseTeacher courseTeacher) {
-        Long id = courseTeacher.getId();
-        if (id == null) {
-            // id为null，新增教师
-            CourseTeacher teacher = new CourseTeacher();
-            BeanUtils.copyProperties(courseTeacher, teacher);
-            teacher.setCreateDate(LocalDateTime.now());
-            int flag = courseTeacherMapper.insert(teacher);
-            if (flag <= 0)
-                JwbException.cast("新增失败");
-            return getCourseTeacher(teacher);
-        } else {
-            // id不为null，修改教师
-            CourseTeacher teacher = courseTeacherMapper.selectById(id);
-            BeanUtils.copyProperties(courseTeacher, teacher);
-            int flag = courseTeacherMapper.updateById(teacher);
-            if (flag <= 0)
-                JwbException.cast("修改失败");
-            return getCourseTeacher(teacher);
+        CourseTeacher courseTeacher = courseTeacherMapper.selectOne(queryWrapper);
+        if (courseTeacher == null) {
+            return null;
         }
+        return teacherServiceClient.getTeacher(String.valueOf(courseTeacher.getTeacherId()));
     }
+
 
     @Override
     public void deleteCourseTeacher(Long courseId, Long teacherId) {
         LambdaQueryWrapper<CourseTeacher> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(CourseTeacher::getId, teacherId);
+        queryWrapper.eq(CourseTeacher::getTeacherId, teacherId);
         queryWrapper.eq(CourseTeacher::getCourseId, courseId);
         int flag = courseTeacherMapper.delete(queryWrapper);
         if (flag < 0)
             JwbException.cast("删除失败");
+    }
+
+    @Override
+    public void updateTeacher(Long courseBaseId, Long courseTeacherId) {
+        LambdaQueryWrapper<CourseTeacher> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CourseTeacher::getCourseId, courseBaseId);
+        CourseTeacher courseTeacher = courseTeacherMapper.selectOne(queryWrapper);
+        // 没有就插入,有就更新
+        if (courseTeacher == null) {
+            CourseTeacher newCourseTeacher = new CourseTeacher();
+            newCourseTeacher.setTeacherId(courseTeacherId);
+            newCourseTeacher.setCourseId(courseBaseId);
+            newCourseTeacher.setCreateDate(LocalDateTime.now());
+            newCourseTeacher.setUpdateTime(LocalDateTime.now());
+            courseTeacherMapper.insert(newCourseTeacher);
+        } else {
+            courseTeacher.setTeacherId(courseTeacherId);
+            courseTeacher.setUpdateTime(LocalDateTime.now());
+            courseTeacherMapper.updateById(courseTeacher);
+        }
     }
 
     public CourseTeacher getCourseTeacher(CourseTeacher courseTeacher) {

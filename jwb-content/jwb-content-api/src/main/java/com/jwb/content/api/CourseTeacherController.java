@@ -1,14 +1,12 @@
 package com.jwb.content.api;
 
-import com.jwb.content.model.po.CourseTeacher;
+import com.jwb.content.model.po.JwbTeacher;
 import com.jwb.content.service.CourseTeacherService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -17,23 +15,19 @@ public class CourseTeacherController {
     @Autowired
     private CourseTeacherService courseTeacherService;
 
+
     @ApiOperation("查询教师信息接口")
     @GetMapping("/courseTeacher/list/{courseId}")
-    public List<CourseTeacher> getCourseTeacherList(@PathVariable Long courseId) {
+    public JwbTeacher getCourseTeacherList(@PathVariable Long courseId) {
         return courseTeacherService.getCourseTeacherList(courseId);
     }
 
-    @ApiOperation("查询教师排行信息接口")
-    @GetMapping("/courseTeacher/list")
-    public List<CourseTeacher> getCourseTeacherRank() {
-        return courseTeacherService.getCourseTeacherRank();
+    @ApiOperation("更新教师信息接口")
+    @PutMapping("/updateTeacher/{courseBaseId}/{courseTeacherId}")
+    public void updateCourseTeacher(@PathVariable Long courseBaseId, @PathVariable Long courseTeacherId) {
+        courseTeacherService.updateTeacher(courseBaseId, courseTeacherId);
     }
 
-    @ApiOperation("添加/修改教师信息接口")
-    @PostMapping("/courseTeacher")
-    public CourseTeacher saveCourseTeacher(@RequestBody CourseTeacher courseTeacher) {
-        return courseTeacherService.saveCourseTeacher(courseTeacher);
-    }
 
     @ApiOperation("删除教师信息接口")
     @DeleteMapping("/courseTeacher/course/{courseId}/{teacherId}")

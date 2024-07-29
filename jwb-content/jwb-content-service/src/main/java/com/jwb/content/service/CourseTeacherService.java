@@ -1,15 +1,11 @@
 package com.jwb.content.service;
 
-import com.jwb.content.model.po.CourseTeacher;
-
-import java.util.List;
+import com.jwb.content.model.po.JwbTeacher;
 
 public interface CourseTeacherService {
-    List<CourseTeacher> getCourseTeacherList(Long courseId);
-
-    List<CourseTeacher> getCourseTeacherRank();
-
-    CourseTeacher saveCourseTeacher(CourseTeacher courseTeacher);
+    JwbTeacher getCourseTeacherList(Long courseId);
 
     void deleteCourseTeacher(Long courseId, Long teacherId);
+
+    void updateTeacher(Long courseBaseId, Long courseTeacherId);
 }

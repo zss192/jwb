@@ -1,56 +1,42 @@
 package com.jwb.content.model.po;
 
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 课程-教师关系表(CourseTeacher)实体类
+ * 课程-教师关系表
  *
- * @author makejava
- * @since 2024-06-10 18:41:30
+ * @TableName course_teacher
  */
-@Getter
-@Setter
+
+@Data
 public class CourseTeacher implements Serializable {
-    private static final long serialVersionUID = -13892189285468110L;
     /**
      * 主键
      */
-    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
+
     /**
-     * 课程标识
+     * 课程id
      */
     private Long courseId;
+
     /**
-     * 教师标识
+     * 教师id
      */
-    private String teacherName;
-    /**
-     * 教师职位
-     */
-    private String position;
-    /**
-     * 教师简介
-     */
-    private String introduction;
-    /**
-     * 照片
-     */
-    private String photograph;
-    /**
-     * 学习人数
-     */
-    private Long count;
+    private Long teacherId;
+
     /**
      * 创建时间
      */
     private LocalDateTime createDate;
-}
 
+    /**
+     *
+     */
+    private LocalDateTime updateTime;
+
+    private static final long serialVersionUID = 1L;
+}

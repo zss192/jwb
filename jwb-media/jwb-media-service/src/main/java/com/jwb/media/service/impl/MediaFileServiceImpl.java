@@ -130,7 +130,12 @@ public class MediaFileServiceImpl implements MediaFileService {
             String filename = uploadFileParamsDto.getFilename();
             objectName = fileMD5 + filename.substring(filename.lastIndexOf("."));
         }
-        objectName = folder + objectName;
+        if (folder.endsWith("/") || objectName.startsWith("/")) {
+            objectName = folder + objectName;
+        } else {
+            objectName = folder + "/" + objectName;
+        }
+
         // 上传到MinIO
         addMediaFilesToMinIO(bytes, bucket_files, objectName);
         // 信息添加到数据库

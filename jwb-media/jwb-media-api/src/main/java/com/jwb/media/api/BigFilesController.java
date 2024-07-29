@@ -1,12 +1,10 @@
 package com.jwb.media.api;
 
 import com.jwb.base.model.RestResponse;
-import com.jwb.base.utils.SecurityUtil;
 import com.jwb.media.model.dto.UploadFileParamsDto;
 import com.jwb.media.service.MediaFileService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,8 +39,7 @@ public class BigFilesController {
     @ApiOperation(value = "合并分块文件")
     @PostMapping("/upload/mergechunks")
     public RestResponse<Boolean> mergeChunks(@RequestParam("fileMd5") String fileMd5, @RequestParam("fileName") String fileName, @RequestParam("chunkTotal") int chunkTotal) {
-        SecurityUtil.JwbUser user = SecurityUtil.getUser();
-        Long companyId = StringUtils.isNotEmpty(user.getCompanyId()) ? Long.parseLong(user.getCompanyId()) : null;
+        Long companyId = 1232141425L;
         UploadFileParamsDto uploadFileParamsDto = new UploadFileParamsDto();
         uploadFileParamsDto.setFileType("001002");
         uploadFileParamsDto.setTags("课程视频");

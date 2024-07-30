@@ -12,7 +12,10 @@ import com.jwb.content.mapper.CoursePublishPreMapper;
 import com.jwb.content.model.dto.CourseBaseInfoDto;
 import com.jwb.content.model.dto.CoursePreviewDto;
 import com.jwb.content.model.dto.TeachplanDto;
-import com.jwb.content.model.po.*;
+import com.jwb.content.model.po.CourseBase;
+import com.jwb.content.model.po.CourseMarket;
+import com.jwb.content.model.po.CoursePublish;
+import com.jwb.content.model.po.CoursePublishPre;
 import com.jwb.content.service.CourseBaseService;
 import com.jwb.content.service.CoursePublishService;
 import com.jwb.content.service.TeachplanService;
@@ -25,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -69,6 +73,9 @@ public class CoursePublishServiceImpl implements CoursePublishService {
     StringRedisTemplate redisTemplate;
     @Autowired
     RedissonClient redissonClient;
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
 
 
     @Override
@@ -259,16 +266,8 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
     @Override
     public Boolean saveCourseIndex(Long courseId) {
-        // 1. 取出课程发布信息
-        CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
-        // 2. 拷贝至课程索引对象
-        CourseIndex courseIndex = new CourseIndex();
-        BeanUtils.copyProperties(coursePublish, courseIndex);
-        // 3. 远程调用搜索服务API，添加课程索引信息
-        Boolean result = searchServiceClient.add(courseIndex);
-        if (!result) {
-            JwbException.cast("添加索引失败");
-        }
+        // 发送消息到MQ，添加或修改课程索引
+        rabbitTemplate.convertAndSend("course.topic.exchange", "course.insert", courseId);
         return true;
     }
 

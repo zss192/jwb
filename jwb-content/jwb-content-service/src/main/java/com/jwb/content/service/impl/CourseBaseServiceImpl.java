@@ -17,6 +17,7 @@ import com.jwb.content.model.po.Teachplan;
 import com.jwb.content.service.CourseBaseService;
 import com.jwb.content.service.CourseMarketService;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,8 @@ public class CourseBaseServiceImpl implements CourseBaseService {
     CourseTeacherMapper courseTeacherMapper;
     @Autowired
     TeachplanMapper teachplanMapper;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public PageResult<CourseBase> queryCourseBaseList(Long companyId, PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
@@ -207,6 +210,10 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         courseMarketMapper.deleteById(courseId);
         // 删除课程基本信息
         courseBaseMapper.deleteById(courseId);
+        // 如果课程已发布还要删除elasticSearch中的课程信息
+        if ("203002".equals(courseBase.getStatus())) {
+            rabbitTemplate.convertAndSend("course.topic.exchange", "course.delete", courseId);
+        }
     }
 
     @Override

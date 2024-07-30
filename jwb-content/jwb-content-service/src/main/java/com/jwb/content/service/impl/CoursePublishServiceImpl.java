@@ -258,7 +258,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
     @Override
     public void uploadCourseHtml(Long courseId, File file) {
         MultipartFile multipartFile = MultipartSupportConfig.getMultipartFile(file);
-        String course = mediaServiceClient.upload(multipartFile, "course", courseId + ".html");
+        String course = mediaServiceClient.upload(multipartFile, "course", courseId + ".html", "静态页面");
         if (course == null) {
             JwbException.cast("远程调用媒资服务上传文件失败");
         }

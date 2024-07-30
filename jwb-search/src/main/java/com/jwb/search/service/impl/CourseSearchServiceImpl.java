@@ -25,6 +25,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -92,6 +93,11 @@ public class CourseSearchServiceImpl implements CourseSearchService {
         int start = (int) ((pageNo - 1) * pageSize);
         searchSourceBuilder.from(start);
         searchSourceBuilder.size(Math.toIntExact(pageSize));
+        // 先根据排序字段排序，再根据学习人数降序排序
+        if (StringUtils.isNotEmpty(courseSearchParam.getSort())) {
+            searchSourceBuilder.sort(courseSearchParam.getSort(), courseSearchParam.getSortType() == 0 ? SortOrder.ASC : SortOrder.DESC);
+        }
+        searchSourceBuilder.sort("studyCount", SortOrder.DESC);
         //布尔查询
         searchSourceBuilder.query(boolQueryBuilder);
         //高亮设置

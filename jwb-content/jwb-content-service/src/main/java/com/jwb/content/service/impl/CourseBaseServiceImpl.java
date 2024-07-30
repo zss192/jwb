@@ -83,6 +83,7 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         BeanUtils.copyProperties(addCourseDto, courseBase);
         courseBase.setCompanyId(companyId);
         courseBase.setCreateDate(LocalDateTime.now());
+        courseBase.setChangeDate(LocalDateTime.now());
         courseBase.setAuditStatus("202002");
         courseBase.setStatus("203001");
 

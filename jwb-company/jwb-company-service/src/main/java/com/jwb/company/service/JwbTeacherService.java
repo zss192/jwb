@@ -17,4 +17,6 @@ public interface JwbTeacherService extends IService<JwbTeacher> {
     JwbTeacher getTeacher(String id);
 
     List<JwbTeacher> getTeacherList();
+
+    List<JwbTeacher> getTeacherRank(Long count);
 }

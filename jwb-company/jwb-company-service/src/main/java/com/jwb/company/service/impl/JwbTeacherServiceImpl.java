@@ -1,5 +1,6 @@
 package com.jwb.company.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jwb.company.mapper.JwbTeacherMapper;
 import com.jwb.company.model.po.JwbTeacher;
@@ -48,6 +49,19 @@ public class JwbTeacherServiceImpl extends ServiceImpl<JwbTeacherMapper, JwbTeac
     @Override
     public List<JwbTeacher> getTeacherList() {
         return jwbTeacherMapper.selectList(null);
+    }
+
+    /**
+     * 查询教师排行榜
+     *
+     * @return
+     */
+    @Override
+    public List<JwbTeacher> getTeacherRank(Long count) {
+        QueryWrapper<JwbTeacher> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("count");
+        queryWrapper.last("LIMIT " + count);
+        return jwbTeacherMapper.selectList(queryWrapper);
     }
 }
 

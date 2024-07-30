@@ -35,4 +35,10 @@ public class TeacherController {
     public List<JwbTeacher> getTeacherList() {
         return jwbTeacherService.getTeacherList();
     }
+
+    @ApiOperation(value = "查询教师排行榜", tags = "查询教师排行榜")
+    @GetMapping("/teacher/rank")
+    public List<JwbTeacher> getTeacherRank(Long count) {
+        return jwbTeacherService.getTeacherRank(count);
+    }
 }

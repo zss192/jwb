@@ -1,6 +1,8 @@
 package com.jwb.content.api;
 
+import com.jwb.content.model.dto.CourseDynamicDto;
 import com.jwb.content.model.dto.CoursePreviewDto;
+import com.jwb.content.service.CourseBaseService;
 import com.jwb.content.service.CoursePublishService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,10 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class CourseOpenController {
     @Autowired
     private CoursePublishService coursePublishService;
+    @Autowired
+    private CourseBaseService courseBaseService;
 
     @ApiOperation("查询课程预览计划信息")
     @GetMapping("/course/whole/{courseId}")
     public CoursePreviewDto getPreviewInfo(@PathVariable Long courseId) {
         return coursePublishService.getCoursePreviewInfo(courseId);
+    }
+
+    @ApiOperation("查询课程动态信息")
+    @GetMapping("/course/dynamic/{courseId}")
+    public CourseDynamicDto getCourseDynamicInfo(@PathVariable Long courseId) {
+        return courseBaseService.getCourseDynamicInfo(courseId);
     }
 }

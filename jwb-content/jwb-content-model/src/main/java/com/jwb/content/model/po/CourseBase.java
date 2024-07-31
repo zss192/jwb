@@ -76,6 +76,10 @@ public class CourseBase implements Serializable {
      */
     private Long studyCount;
     /**
+     * 收藏人数
+     */
+    private Long favoriteCount;
+    /**
      * 创建时间
      */
     private LocalDateTime createDate;

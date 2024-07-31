@@ -136,5 +136,9 @@ public class CoursePublish implements Serializable {
      * 课程学习人数
      */
     private Long studyCount;
+    /**
+     * 课程收藏人数
+     */
+    private Long favoriteCount;
 }
 

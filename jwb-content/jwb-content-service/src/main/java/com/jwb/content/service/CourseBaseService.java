@@ -2,10 +2,7 @@ package com.jwb.content.service;
 
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
-import com.jwb.content.model.dto.AddCourseDto;
-import com.jwb.content.model.dto.CourseBaseInfoDto;
-import com.jwb.content.model.dto.EditCourseDto;
-import com.jwb.content.model.dto.QueryCourseParamsDto;
+import com.jwb.content.model.dto.*;
 import com.jwb.content.model.po.CourseBase;
 
 /**
@@ -29,4 +26,12 @@ public interface CourseBaseService {
     void delectCourse(Long companyId, Long courseId);
 
     void addStudyCount(Long companyId, Long courseId);
+
+    /**
+     * 获取课程动态信息
+     *
+     * @param courseId 课程id
+     * @return 课程动态信息
+     */
+    CourseDynamicDto getCourseDynamicInfo(Long courseId);
 }

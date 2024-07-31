@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="/static/img/asset-favicon.ico">
-    <title>学成在线-${model.courseBase.name!''}</title>
+    <title>技网帮-${model.courseBase.name!''}</title>
 
     <link rel="stylesheet" href="/static/plugins/normalize-css/normalize.css"/>
     <link rel="stylesheet" href="/static/plugins/bootstrap/dist/css/bootstrap.css"/>
@@ -70,9 +70,16 @@
                     </a>
                 </p>
                 <p class="vid-act">
-                    <span> <i class="i-heart"></i>收藏 23 </span>
-                    <span> <i class="i-heart"></i>${model.courseBase.studyCount} 人在学 </span>
-                    <span>分享 <i class="i-weixin"></i><i class="i-qq"></i></span>
+                        <span @click.prevent="clickFavorite()">
+                            <svg t="1722398531667" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                 xmlns="http://www.w3.org/2000/svg" p-id="8526" width="18" height="18"
+                                 style="vertical-align: middle;">
+                                <path
+                                        d="M538 118c9.99 5.583 18.422 14.03 24 24l93.638 182.64a32 32 0 0 0 23.285 16.977L882 375c30.534 5.454 51.237 34.271 46 64-1.612 12.35-7.026 22.993-15 31L768.26 616.596a32 32 0 0 0-8.872 27.251L790 847c5.143 31.004-15.82 59.631-46 64-11.89 2.11-23.668 0.241-34-5l-183.574-92.714a32 32 0 0 0-28.852 0L314 906c-27.548 13.925-61.207 2.8-75-25-5.358-10.275-7.224-22.072-5-34l30.612-203.153a32 32 0 0 0-8.872-27.251L111 470c-21.545-21.716-21.384-57.219 1-79 7.85-8.229 18.475-13.651 30-16l203.077-33.383a32 32 0 0 0 23.285-16.977L462 142c14.395-27.127 48.153-37.945 76-24z"
+                                        :fill="isFavorite ? '#00a4ffed' : '#DADADA'" p-id="8527"></path>
+                            </svg>{{ favoriteCount }} 人收藏
+                        </span>
+                    <span> {{ studyCount }} 人在学 </span>
                 </p>
             </div>
         </div>

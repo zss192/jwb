@@ -6,10 +6,7 @@ import com.jwb.base.exception.JwbException;
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
 import com.jwb.content.mapper.*;
-import com.jwb.content.model.dto.AddCourseDto;
-import com.jwb.content.model.dto.CourseBaseInfoDto;
-import com.jwb.content.model.dto.EditCourseDto;
-import com.jwb.content.model.dto.QueryCourseParamsDto;
+import com.jwb.content.model.dto.*;
 import com.jwb.content.model.po.CourseBase;
 import com.jwb.content.model.po.CourseMarket;
 import com.jwb.content.model.po.CourseTeacher;
@@ -221,6 +218,22 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         CourseBase courseBase = courseBaseMapper.selectById(courseId);
         courseBase.setStudyCount(courseBase.getStudyCount() + 1);
         courseBaseMapper.updateById(courseBase);
+    }
+
+    /**
+     * 获取课程动态信息
+     *
+     * @param courseId 课程id
+     * @return 课程动态信息
+     */
+    @Override
+    public CourseDynamicDto getCourseDynamicInfo(Long courseId) {
+        // TODO:用Redis优化
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        CourseDynamicDto courseDynamicDto = new CourseDynamicDto();
+        courseDynamicDto.setStudyCount(courseBase.getStudyCount());
+        courseDynamicDto.setFavoriteCount(courseBase.getFavoriteCount());
+        return courseDynamicDto;
     }
 }
 

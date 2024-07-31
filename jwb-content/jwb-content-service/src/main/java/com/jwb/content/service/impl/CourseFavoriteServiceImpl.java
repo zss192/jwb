@@ -9,6 +9,7 @@ import com.jwb.content.model.po.CourseBase;
 import com.jwb.content.model.po.CourseFavorite;
 import com.jwb.content.service.CourseFavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,8 @@ public class CourseFavoriteServiceImpl extends ServiceImpl<CourseFavoriteMapper,
     private CourseFavoriteMapper courseFavoriteMapper;
     @Autowired
     private CourseBaseMapper courseBaseMapper;
+    @Autowired
+    StringRedisTemplate redisTemplate;
 
     /**
      * 课程收藏
@@ -49,6 +52,9 @@ public class CourseFavoriteServiceImpl extends ServiceImpl<CourseFavoriteMapper,
         } else {
             removeFavorite(courseId, courseFavorite);
         }
+        // 信息同步更新到Redis 先更新后删除
+        String cacheKey = "course_dynamic:" + courseId;
+        redisTemplate.delete(cacheKey);
     }
 
     private void addFavorite(Long courseId, Long userId, CourseFavorite courseFavorite) {

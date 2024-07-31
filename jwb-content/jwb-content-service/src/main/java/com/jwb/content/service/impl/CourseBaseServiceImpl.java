@@ -1,5 +1,6 @@
 package com.jwb.content.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jwb.base.exception.JwbException;
@@ -13,15 +14,21 @@ import com.jwb.content.model.po.CourseTeacher;
 import com.jwb.content.model.po.Teachplan;
 import com.jwb.content.service.CourseBaseService;
 import com.jwb.content.service.CourseMarketService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author zss
@@ -29,6 +36,7 @@ import java.util.List;
  * @createDate 2024-06-11 16:24:40
  */
 @Service
+@Slf4j
 public class CourseBaseServiceImpl implements CourseBaseService {
     @Autowired
     CourseBaseMapper courseBaseMapper;
@@ -44,6 +52,10 @@ public class CourseBaseServiceImpl implements CourseBaseService {
     TeachplanMapper teachplanMapper;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Autowired
+    StringRedisTemplate redisTemplate;
+    @Autowired
+    RedissonClient redissonClient;
 
     @Override
     public PageResult<CourseBase> queryCourseBaseList(Long companyId, PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
@@ -218,6 +230,9 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         CourseBase courseBase = courseBaseMapper.selectById(courseId);
         courseBase.setStudyCount(courseBase.getStudyCount() + 1);
         courseBaseMapper.updateById(courseBase);
+        // 信息同步更新到Redis 先更新后删除
+        String cacheKey = "course_dynamic:" + courseId;
+        redisTemplate.delete(cacheKey);
     }
 
     /**
@@ -228,12 +243,45 @@ public class CourseBaseServiceImpl implements CourseBaseService {
      */
     @Override
     public CourseDynamicDto getCourseDynamicInfo(Long courseId) {
-        // TODO:用Redis优化
-        CourseBase courseBase = courseBaseMapper.selectById(courseId);
-        CourseDynamicDto courseDynamicDto = new CourseDynamicDto();
-        courseDynamicDto.setStudyCount(courseBase.getStudyCount());
-        courseDynamicDto.setFavoriteCount(courseBase.getFavoriteCount());
-        return courseDynamicDto;
+        String cacheKey = "course_dynamic:" + courseId;
+        // 从缓存中查询
+        String courseDynamicCacheJson = redisTemplate.opsForValue().get(cacheKey);
+        if (StringUtils.isNotEmpty(courseDynamicCacheJson)) {
+            log.debug("从缓存中查询");
+            return "null".equals(courseDynamicCacheJson) ? null : JSON.parseObject(courseDynamicCacheJson, CourseDynamicDto.class);
+        }
+
+        // 加分布式锁防止缓存击穿和缓存雪崩
+        RLock lock = redissonClient.getLock("courseDynamicQueryLock" + courseId);
+        lock.lock();
+        try {
+            // 再次从缓存中查询，避免并发时重复查询数据库
+            courseDynamicCacheJson = redisTemplate.opsForValue().get(cacheKey);
+            if (StringUtils.isNotEmpty(courseDynamicCacheJson)) {
+                log.debug("从缓存中查询");
+                return "null".equals(courseDynamicCacheJson) ? null : JSON.parseObject(courseDynamicCacheJson, CourseDynamicDto.class);
+            }
+
+            log.debug("缓存中没有，查询数据库");
+            CourseBase courseBase = courseBaseMapper.selectById(courseId);
+            CourseDynamicDto courseDynamicDto = new CourseDynamicDto();
+            if (courseBase == null) {
+                // 缓存空值防止缓存穿透
+                redisTemplate.opsForValue().set(cacheKey, "null", 5 + new Random().nextInt(10), TimeUnit.SECONDS);
+                return null;
+            } else {
+                courseDynamicDto.setStudyCount(courseBase.getStudyCount());
+                courseDynamicDto.setFavoriteCount(courseBase.getFavoriteCount());
+            }
+
+            // 缓存查询结果
+            String jsonString = JSON.toJSONString(courseDynamicDto);
+            // 过期时间加上一个随机值防止缓存雪崩
+            redisTemplate.opsForValue().set(cacheKey, jsonString, 900 + new Random().nextInt(100), TimeUnit.SECONDS);
+            return courseDynamicDto;
+        } finally {
+            lock.unlock();
+        }
     }
 }
 

@@ -119,12 +119,12 @@
                             <div class="content-com course">
                                 <div class="title"><span>课程制作</span></div>
                                 <div class="cont">
-                                    <div class="img-box"><img src="/static/img/widget-myImg.jpg" alt=""></div>
+                                    <div class="img-box"><img src="/file${model.teacher.photograph}" alt=""></div>
                                     <div class="info-box">
-                                        <p class="name">教学方：<em>XX老师</em></p>
-                                        <!-- <p class="lab">高级前端开发工程师 10年开发经验</p>-->
+                                        <p class="name">教学方：<em>${model.teacher.teacherName!""}老师</em></p>
+                                        <p class="lab">${model.teacher.position!""}</p>
                                         <p class="info">
-                                            JavaEE开发与教学多年，精通JavaEE技术体系，对流行框架JQuery、DWR、Struts1/2，Hibernate，Spring，MyBatis、JBPM、Lucene等有深入研究。授课逻辑严谨，条理清晰，注重学生独立解决问题的能力。</p>
+                                            ${model.teacher.introduction!""}</p>
                                         <!-- <p><span>难度等级</span>中级</p>
                                          <p><span>课程时长</span>8-16小时/周，共4周</p>
                                          <p><span>如何通过</span>通过所有的作业及考核，作业共4份，考核为一次终极考核</p>

@@ -1,5 +1,6 @@
 package com.jwb.content.model.dto;
 
+import com.jwb.content.model.po.JwbTeacher;
 import lombok.Data;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class CoursePreviewDto {
     List<TeachplanDto> teachplans;
 
     /**
-     * 师资信息暂时不加
+     * 师资信息
      */
-
+    JwbTeacher teacher;
 }

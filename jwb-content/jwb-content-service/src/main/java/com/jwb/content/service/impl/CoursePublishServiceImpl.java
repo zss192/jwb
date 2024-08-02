@@ -12,12 +12,10 @@ import com.jwb.content.mapper.CoursePublishPreMapper;
 import com.jwb.content.model.dto.CourseBaseInfoDto;
 import com.jwb.content.model.dto.CoursePreviewDto;
 import com.jwb.content.model.dto.TeachplanDto;
-import com.jwb.content.model.po.CourseBase;
-import com.jwb.content.model.po.CourseMarket;
-import com.jwb.content.model.po.CoursePublish;
-import com.jwb.content.model.po.CoursePublishPre;
+import com.jwb.content.model.po.*;
 import com.jwb.content.service.CourseBaseService;
 import com.jwb.content.service.CoursePublishService;
+import com.jwb.content.service.CourseTeacherService;
 import com.jwb.content.service.TeachplanService;
 import com.jwb.messagesdk.model.po.MqMessage;
 import com.jwb.messagesdk.service.MqMessageService;
@@ -61,6 +59,8 @@ public class CoursePublishServiceImpl implements CoursePublishService {
     CoursePublishPreMapper coursePublishPreMapper;
     @Autowired
     CoursePublishMapper coursePublishMapper;
+    @Autowired
+    private CourseTeacherService courseTeacherService;
     // 注入消息SDK
     @Autowired
     MqMessageService mqMessageService;
@@ -88,9 +88,12 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         CoursePreviewDto coursePreviewDto = new CoursePreviewDto();
         // 根据课程id，查询课程计划
         List<TeachplanDto> teachplanDtos = teachplanService.findTeachplanTree(courseId);
+        // 查询课程讲师信息
+        JwbTeacher teacher = courseTeacherService.getCourseTeacherList(courseId);
         // 封装返回
         coursePreviewDto.setCourseBase(courseBase);
         coursePreviewDto.setTeachplans(teachplanDtos);
+        coursePreviewDto.setTeacher(teacher);
         return coursePreviewDto;
     }
 

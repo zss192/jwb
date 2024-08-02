@@ -35,9 +35,9 @@ public interface OrderService {
      * @param payNo 支付记录id
      * @return 支付记录信息
      */
-    PayRecordDto queryPayResult(String payNo);
+    JwbPayRecord queryPayResult(String payNo);
 
-    void saveAlipayStatus(PayStatusDto payStatusDto);
+    JwbPayRecord saveAlipayStatus(PayStatusDto payStatusDto);
 
     void scanToPay(String payNo, HttpServletResponse response) throws AlipayApiException, IOException;
 

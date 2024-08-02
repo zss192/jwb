@@ -93,9 +93,9 @@ public class OrderServiceImpl implements OrderService {
         String qrCode = null;
         try {
             // 3.1 用订单号填充占位符
-            qrcodeurl = String.format(qrcodeurl, payRecord.getPayNo());
+            String url = qrcodeurl + payRecord.getPayNo();
             // 3.2 生成二维码
-            qrCode = new QRCodeUtil().createQRCode(qrcodeurl, 200, 200);
+            qrCode = new QRCodeUtil().createQRCode(url, 200, 200);
         } catch (IOException e) {
             JwbException.cast("生成二维码出错");
         }
@@ -148,7 +148,10 @@ public class OrderServiceImpl implements OrderService {
      * @param businessId 业务id是选课记录表中的主键
      */
     public JwbOrders getOrderByBusinessId(String businessId) {
-        return OrdersMapper.selectOne(new LambdaQueryWrapper<JwbOrders>().eq(JwbOrders::getOutBusinessId, businessId));
+        return OrdersMapper.selectOne(new LambdaQueryWrapper<JwbOrders>()
+                .eq(JwbOrders::getOutBusinessId, businessId)
+                .eq(JwbOrders::getStatus, "600001") // 待支付
+        );
     }
 
     public JwbPayRecord createPayRecord(JwbOrders orders) {
@@ -180,15 +183,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public PayRecordDto queryPayResult(String payNo) {
+    public JwbPayRecord queryPayResult(String payNo) {
 
         // 1. 调用支付宝接口查询支付结果
         PayStatusDto payStatusDto = queryPayResultFromAlipay(payNo);
 
         // 2. 拿到支付结果，更新支付记录表和订单表的状态为 已支付
-        saveAlipayStatus(payStatusDto);
+        JwbPayRecord jwbPayRecord = saveAlipayStatus(payStatusDto);
 
-        return null;
+        return jwbPayRecord;
     }
 
     /**
@@ -236,7 +239,7 @@ public class OrderServiceImpl implements OrderService {
         return payStatusDto;
     }
 
-    public void saveAlipayStatus(PayStatusDto payStatusDto) {
+    public JwbPayRecord saveAlipayStatus(PayStatusDto payStatusDto) {
         // 1. 获取支付流水号
         String payNo = payStatusDto.getOut_trade_no();
         // 2. 查询数据库订单状态
@@ -251,7 +254,7 @@ public class OrderServiceImpl implements OrderService {
         String statusFromDB = payRecord.getStatus();
         // 2.1 已支付，直接返回
         if ("600002".equals(statusFromDB)) {
-            return;
+            return null;
         }
         // 3. 查询支付宝交易状态
         String tradeStatus = payStatusDto.getTrade_status();
@@ -278,6 +281,7 @@ public class OrderServiceImpl implements OrderService {
         MqMessage mqMessage = mqMessageService.addMessage("payresult_notify", order.getOutBusinessId(), order.getOrderType(), null);
         // 5. 发送消息
         notifyPayResult(mqMessage);
+        return payRecord;
     }
 
     @Override
@@ -288,7 +292,7 @@ public class OrderServiceImpl implements OrderService {
         }
         String status = payRecord.getStatus();
         if ("601002".equals(status)) {
-            JwbException.cast("订单已支付，请勿重复支付");
+            JwbException.cast("，请勿重复支付");
         }
 
         // 请求支付宝接口进行支付

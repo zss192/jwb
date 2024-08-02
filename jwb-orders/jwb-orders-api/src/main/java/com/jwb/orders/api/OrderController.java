@@ -4,6 +4,7 @@ import com.alipay.api.AlipayApiException;
 import com.jwb.base.exception.JwbException;
 import com.jwb.orders.model.dto.AddOrderDto;
 import com.jwb.orders.model.dto.PayRecordDto;
+import com.jwb.orders.model.po.JwbPayRecord;
 import com.jwb.orders.service.OrderService;
 import com.jwb.orders.util.SecurityUtil;
 import io.swagger.annotations.Api;
@@ -37,6 +38,7 @@ public class OrderController {
         return orderService.createOrder(user.getId(), addOrderDto);
     }
 
+    // TODO:域名备案后更改frp和nacos请求地址配置
     @ApiOperation("扫码下单接口")
     @GetMapping("/requestpay")
     public void requestpay(String payNo, HttpServletResponse response) throws IOException, AlipayApiException {
@@ -46,12 +48,11 @@ public class OrderController {
     // 前端点击 支付完成 主动查询，然后更新订单表（前端按钮已隐藏）
     @ApiOperation("主动查询支付结果")
     @GetMapping("/payresult")
-    public PayRecordDto payresult(String payNo) {
+    public JwbPayRecord payresult(String payNo) {
         return orderService.queryPayResult(payNo);
     }
 
     // 扫码支付后通过回调地址自动请求该接口
-    // TODO：支付成功后前端要手动刷新，优化流程
     @ApiOperation("被动支付通知")
     @PostMapping("/paynotify")
     public void paynotify(HttpServletRequest request, HttpServletResponse response) throws IOException, AlipayApiException {

@@ -1,6 +1,10 @@
 package com.jwb.orders.api;
 
+import com.jwb.base.model.PageParams;
+import com.jwb.base.model.PageResult;
 import com.jwb.orders.model.dto.OrdersListDto;
+import com.jwb.orders.model.dto.QueryOrdersDto;
+import com.jwb.orders.model.po.JwbOrders;
 import com.jwb.orders.service.MyOrdersService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,6 +25,12 @@ public class MyOrdersController {
     @GetMapping("/list/{userId}")
     public List<OrdersListDto> getOrdersList(@PathVariable Long userId) {
         return myOrdersService.getOrdersList(userId);
+    }
+
+    @ApiOperation("机构端查询所有订单列表")
+    @PostMapping("/orders/org-list")
+    public PageResult<JwbOrders> getAllOrdersList(PageParams pageParams, @RequestBody QueryOrdersDto queryOrdersDto) {
+        return myOrdersService.getAllOrdersList(pageParams, queryOrdersDto);
     }
 
     @ApiOperation("取消订单")

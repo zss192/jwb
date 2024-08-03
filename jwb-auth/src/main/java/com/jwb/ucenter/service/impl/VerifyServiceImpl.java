@@ -1,6 +1,7 @@
 package com.jwb.ucenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.jwb.base.utils.SnowFlakeUtil;
 import com.jwb.ucenter.mapper.JwbUserMapper;
 import com.jwb.ucenter.mapper.JwbUserRoleMapper;
 import com.jwb.ucenter.model.dto.FindPswDto;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 public class VerifyServiceImpl implements VerifyService {
@@ -70,7 +70,8 @@ public class VerifyServiceImpl implements VerifyService {
     @Override
     @Transactional
     public void register(RegisterDto registerDto) {
-        String uuid = UUID.randomUUID().toString();
+        //String uuid = UUID.randomUUID().toString();
+        String uuid = String.valueOf(SnowFlakeUtil.nextId());
         String email = registerDto.getEmail();
         String checkcode = registerDto.getCheckcode();
 

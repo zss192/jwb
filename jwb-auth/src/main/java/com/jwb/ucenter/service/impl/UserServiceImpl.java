@@ -2,6 +2,7 @@ package com.jwb.ucenter.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.jwb.base.utils.SnowFlakeUtil;
 import com.jwb.ucenter.cache.AuthStateRedisCache;
 import com.jwb.ucenter.mapper.JwbUserMapper;
 import com.jwb.ucenter.mapper.JwbUserRoleMapper;
@@ -34,7 +35,6 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * JustAuth第三方登录
@@ -124,7 +124,8 @@ public class UserServiceImpl implements UserService, AuthService {
         // 2.2 不存在，新增
         jwbUser = new JwbUser();
         // 2.3 设置主键
-        String uuid = UUID.randomUUID().toString();
+        //String uuid = UUID.randomUUID().toString();
+        String uuid = String.valueOf(SnowFlakeUtil.nextId());
         jwbUser.setId(uuid);
         // 2.4 设置其他数据库非空约束的属性
         jwbUser.setUsername(unionid);

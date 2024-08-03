@@ -4,6 +4,7 @@ import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
 import com.jwb.content.model.dto.QueryCommentDto;
 import com.jwb.content.model.po.CourseComment;
+import com.jwb.content.model.po.CourseScore;
 import com.jwb.content.service.CourseCommentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,5 +34,11 @@ public class CourseCommentController {
     @DeleteMapping("/deleteComment/{id}")
     public Boolean deleteComment(@PathVariable Long id) {
         return courseCommentService.deleteComment(id);
+    }
+
+    @ApiOperation("获取课程评分")
+    @GetMapping("/getCourseScore/{courseId}")
+    public CourseScore getCourseScore(@PathVariable Long courseId) {
+        return courseCommentService.getCourseScore(courseId);
     }
 }

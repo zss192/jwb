@@ -5,6 +5,7 @@ import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
 import com.jwb.content.model.dto.QueryCommentDto;
 import com.jwb.content.model.po.CourseComment;
+import com.jwb.content.model.po.CourseScore;
 
 /**
  * @author zss
@@ -38,4 +39,14 @@ public interface CourseCommentService extends IService<CourseComment> {
      * @return 是否删除成功
      */
     Boolean deleteComment(Long id);
+
+    /**
+     * 获取课程评分
+     *
+     * @param courseId 课程id
+     * @return 课程评分
+     */
+    CourseScore getCourseScore(Long courseId);
+
+    void updateCourseScore(Long courseId);
 }

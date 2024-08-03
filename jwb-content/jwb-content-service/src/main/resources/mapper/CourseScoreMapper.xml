@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jwb.content.mapper.CourseScoreMapper">
+
+    <resultMap id="BaseResultMap" type="com.jwb.content.model.po.CourseScore">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="courseId" column="course_id" jdbcType="BIGINT"/>
+        <result property="avgScore" column="avg_score" jdbcType="DOUBLE"/>
+        <result property="fiveScore" column="five_score" jdbcType="BIGINT"/>
+        <result property="fourScore" column="four_score" jdbcType="BIGINT"/>
+        <result property="threeScore" column="three_score" jdbcType="BIGINT"/>
+        <result property="twoScore" column="two_score" jdbcType="BIGINT"/>
+        <result property="oneScore" column="one_score" jdbcType="BIGINT"/>
+        <result property="sumScore" column="sum_score" jdbcType="DOUBLE"/>
+        <result property="peopleCount" column="people_count" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,courseId,avg_score,
+        five_score,four_score,three_score,
+        two_score,one_score,sum_score,
+        people_count
+    </sql>
+</mapper>

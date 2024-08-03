@@ -8,9 +8,11 @@ import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
 import com.jwb.content.mapper.CourseBaseMapper;
 import com.jwb.content.mapper.CourseCommentMapper;
+import com.jwb.content.mapper.CourseScoreMapper;
 import com.jwb.content.model.dto.QueryCommentDto;
 import com.jwb.content.model.po.CourseBase;
 import com.jwb.content.model.po.CourseComment;
+import com.jwb.content.model.po.CourseScore;
 import com.jwb.content.service.CourseCommentService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author zss
@@ -33,6 +37,10 @@ public class CourseCommentServiceImpl extends ServiceImpl<CourseCommentMapper, C
     private CourseCommentMapper courseCommentMapper;
     @Autowired
     private CourseBaseMapper CourseBaseMapper;
+    @Autowired
+    private CourseScoreMapper courseScoreMapper;
+    @Autowired
+    private CourseCommentService courseCommentService;
 
     /**
      * 添加评论
@@ -56,8 +64,57 @@ public class CourseCommentServiceImpl extends ServiceImpl<CourseCommentMapper, C
         courseComment.setCourseName(CourseName);
         courseComment.setCreateTime(LocalDateTime.now());
         courseCommentMapper.insert(courseComment);
+        // 更新课程评分
+        updateCourseScore(courseComment.getCourseId());
         return courseComment;
     }
+
+    @Transactional
+    @Override
+    public void updateCourseScore(Long courseId) {
+        // 查询课程评分
+        LambdaQueryWrapper<CourseComment> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CourseComment::getCourseId, courseId);
+        List<CourseComment> courseComments = courseCommentMapper.selectList(queryWrapper);
+
+        // 计算课程平均分、评分人数、评分总分
+        double avgScore = courseComments.stream().mapToDouble(CourseComment::getStarRank).average().orElse(0);
+        long peopleCount = courseComments.size();
+        double totalScore = courseComments.stream().mapToDouble(CourseComment::getStarRank).sum();
+
+        // 计算五星/四星/三星/二星/一星评分，四舍五入计算星级
+        Map<Long, Long> starCounts = courseComments.stream()
+                .collect(Collectors.groupingBy(comment -> Math.round(comment.getStarRank()), Collectors.counting()));
+
+        long oneStar = starCounts.getOrDefault(1L, 0L);
+        long twoStar = starCounts.getOrDefault(2L, 0L);
+        long threeStar = starCounts.getOrDefault(3L, 0L);
+        long fourStar = starCounts.getOrDefault(4L, 0L);
+        long fiveStar = starCounts.getOrDefault(5L, 0L);
+
+        // 更新课程评分，无则新增，有则更新
+        CourseScore courseScore = courseScoreMapper.selectOne(
+                new LambdaQueryWrapper<CourseScore>().eq(CourseScore::getCourseId, courseId)
+        );
+
+        if (courseScore == null) {
+            courseScore = new CourseScore();
+            courseScore.setCourseId(courseId);
+            courseScoreMapper.insert(courseScore);
+        }
+
+        courseScore.setAvgScore(avgScore);
+        courseScore.setSumScore(totalScore);
+        courseScore.setPeopleCount(peopleCount);
+        courseScore.setOneScore(oneStar);
+        courseScore.setTwoScore(twoStar);
+        courseScore.setThreeScore(threeStar);
+        courseScore.setFourScore(fourStar);
+        courseScore.setFiveScore(fiveStar);
+
+        courseScoreMapper.updateById(courseScore);
+    }
+
 
     /**
      * 获取指定课程评论
@@ -92,7 +149,22 @@ public class CourseCommentServiceImpl extends ServiceImpl<CourseCommentMapper, C
      */
     @Override
     public Boolean deleteComment(Long id) {
-        return courseCommentMapper.deleteById(id) > 0;
+        Long courseId = courseCommentMapper.selectById(id).getCourseId();
+        int res = courseCommentMapper.deleteById(id);
+        // 更新课程评分
+        courseCommentService.updateCourseScore(courseId);
+        return res > 0;
+    }
+
+    /**
+     * 获取课程评分
+     *
+     * @param courseId 课程id
+     * @return 课程评分
+     */
+    @Override
+    public CourseScore getCourseScore(Long courseId) {
+        return courseScoreMapper.selectOne(new LambdaQueryWrapper<CourseScore>().eq(CourseScore::getCourseId, courseId));
     }
 }
 

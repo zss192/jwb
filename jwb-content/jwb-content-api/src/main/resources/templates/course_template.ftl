@@ -45,8 +45,7 @@
                     高级
                 </#if>
                 </span>
-                    <span><em>课程时长</em>2小时27分</span>
-                    <span><em>评分</em>4.7分</span>
+                    <span><em>评分</em>{{courseScore.avgScore == 0 ? "暂无评" :courseScore.avgScore}}分</span>
                     <span><em>授课模式</em>
                  <#if model.courseBase.teachmode=='200002'>
                      录播
@@ -88,8 +87,8 @@
         <div class="tit-list">
             <a href="javascript:;" id="articleClass" class="active">课程介绍</a>
             <a href="javascript:;" id="articleItem">目录</a>
-            <a href="javascript:;" id="artcleAsk">问答</a>
-            <a href="javascript:;" id="artcleNot">笔记</a>
+            <#--<a href="javascript:;" id="artcleAsk">问答</a>
+            <a href="javascript:;" id="artcleNot">笔记</a>-->
             <a href="javascript:;" id="artcleCod">评价</a>
             <!--<div class="down-fill">
                 <span>资料下载</span>
@@ -103,92 +102,90 @@
         <div class="article-box">
             <div class="articleClass" style="display: block">
                 <!--<div class="rit-title">评价</div>-->
-                <div class="article-cont">
-                    <div class="article-left-box">
-                        <div class="content">
 
-                            <div class="content-com suit">
-                                <div class="title"><span>适用人群</span></div>
-                                <div class="cont cktop">
-                                    <div>
-                                        <p>${model.courseBase.users!""}</p>
-                                    </div>
-                                    <!--<span class="on-off">更多 <i class="i-chevron-bot"></i></span>-->
-                                </div>
-                            </div>
-                            <div class="content-com course">
-                                <div class="title"><span>课程制作</span></div>
-                                <div class="cont">
-                                    <div class="img-box"><img src="/file${model.teacher.photograph}" alt=""></div>
-                                    <div class="info-box">
-                                        <p class="name">教学方：<em>${model.teacher.teacherName!""}老师</em></p>
-                                        <p class="lab">${model.teacher.position!""}</p>
-                                        <p class="info">
-                                            ${model.teacher.introduction!""}</p>
-                                        <!-- <p><span>难度等级</span>中级</p>
-                                         <p><span>课程时长</span>8-16小时/周，共4周</p>
-                                         <p><span>如何通过</span>通过所有的作业及考核，作业共4份，考核为一次终极考核</p>
-                                         <p><span>用户评分</span>平均用户评分 <em>4.9</em> <a href="#">查看全部评价</a></p>
-                                         <p><span>课程价格</span>特惠价格<em>￥999</em> <i> 原价1999 </i></p>-->
-                                    </div>
-                                </div>
+                <div class="article-left-box">
+                    <div class="content">
 
+                        <div class="content-com suit">
+                            <div class="title"><span>适用人群</span></div>
+                            <div class="cont cktop">
+                                <div>
+                                    <p>${model.courseBase.users!""}</p>
+                                </div>
+                                <!--<span class="on-off">更多 <i class="i-chevron-bot"></i></span>-->
                             </div>
-                            <div class="content-com about">
-                                <div class="title"><span>课程介绍</span></div>
-                                <div class="cont cktop">
-                                    <div>
-                                        <p>${model.courseBase.description!""}</p>
-                                    </div>
-                                    <!--<span class="on-off">更多 <i class="i-chevron-bot"></i></span>-->
+                        </div>
+                        <div class="content-com course">
+                            <div class="title"><span>课程制作</span></div>
+                            <div class="cont">
+                                <div class="img-box"><img src="/file${model.teacher.photograph}" alt=""></div>
+                                <div class="info-box">
+                                    <p class="name">教学方：<em>${model.teacher.teacherName!""}老师</em></p>
+                                    <p class="lab">${model.teacher.position!""}</p>
+                                    <p class="info">
+                                        ${model.teacher.introduction!""}</p>
+                                    <!-- <p><span>难度等级</span>中级</p>
+                                     <p><span>课程时长</span>8-16小时/周，共4周</p>
+                                     <p><span>如何通过</span>通过所有的作业及考核，作业共4份，考核为一次终极考核</p>
+                                     <p><span>用户评分</span>平均用户评分 <em>4.9</em> <a href="#">查看全部评价</a></p>
+                                     <p><span>课程价格</span>特惠价格<em>￥999</em> <i> 原价1999 </i></p>-->
                                 </div>
                             </div>
-                            <div class="content-com prob">
-                                <div class="title"><span>常见问题</span></div>
-                                <div class="cont">
-                                    <ul>
-                                        <li class="item"><span class="on-off"><i class="i-chevron-bot"></i> 我什么时候能够访问课程视频与作业？</span>
-                                            <div class="drop-down">
-                                                <p>
-                                                    课程安排灵活，课程费用支付提供180天全程准入和资格证书。自定进度课程建议的最后期限，但你不会受到惩罚错过期限，只要你赚你的证书在180天内。以会话为基础的课程可能要求你在截止日期前保持正轨，但如果你落后了，你可以切换到以后的会议，你完成的任何工作将与你转移。</p>
-                                            </div>
-                                        </li>
-                                        <li class="item"><span class="on-off"><i class="i-chevron-bot"></i> 如何需要额外的时间来完成课程会怎么样？</span>
-                                            <div class="drop-down">
-                                                <p>
-                                                    课程安排灵活，课程费用支付提供180天全程准入和资格证书。自定进度课程建议的最后期限，但你不会受到惩罚错过期限，只要你赚你的证书在180天内。以会话为基础的课程可能要求你在截止日期前保持正轨，但如果你落后了，你可以切换到以后的会议，你完成的任何工作将与你转移。</p>
-                                            </div>
-                                        </li>
-                                        <li class="item"><span class="on-off"><i class="i-chevron-bot"></i> 我支付次课程之后会得到什么？</span>
-                                            <div class="drop-down">
-                                                <p>
-                                                    课程安排灵活，课程费用支付提供180天全程准入和资格证书。自定进度课程建议的最后期限，但你不会受到惩罚错过期限，只要你赚你的证书在180天内。以会话为基础的课程可能要求你在截止日期前保持正轨，但如果你落后了，你可以切换到以后的会议，你完成的任何工作将与你转移。</p>
-                                            </div>
-                                        </li>
-                                        <li class="item"><span class="on-off"><i class="i-chevron-bot"></i> 退款条例是如何规定的？</span>
-                                            <div class="drop-down">
-                                                <p>
-                                                    课程安排灵活，课程费用支付提供180天全程准入和资格证书。自定进度课程建议的最后期限，但你不会受到惩罚错过期限，只要你赚你的证书在180天内。以会话为基础的课程可能要求你在截止日期前保持正轨，但如果你落后了，你可以切换到以后的会议，你完成的任何工作将与你转移。</p>
-                                            </div>
-                                        </li>
-                                        <li class="item"><span class="on-off"><i
-                                                        class="i-chevron-bot"></i> 有助学金？</span>
-                                            <div class="drop-down">
-                                                <p>
-                                                    课程安排灵活，课程费用支付提供180天全程准入和资格证书。自定进度课程建议的最后期限，但你不会受到惩罚错过期限，只要你赚你的证书在180天内。以会话为基础的课程可能要求你在截止日期前保持正轨，但如果你落后了，你可以切换到以后的会议，你完成的任何工作将与你转移。</p>
-                                            </div>
-                                        </li>
-                                    </ul>
+
+                        </div>
+                        <div class="content-com about">
+                            <div class="title"><span>课程介绍</span></div>
+                            <div class="cont cktop">
+                                <div>
+                                    <p>${model.courseBase.description!""}</p>
                                 </div>
+                                <!--<span class="on-off">更多 <i class="i-chevron-bot"></i></span>-->
+                            </div>
+                        </div>
+                        <div class="content-com prob">
+                            <div class="title"><span>常见问题</span></div>
+                            <div class="cont">
+                                <ul>
+                                    <li class="item"><span class="on-off"><i class="i-chevron-bot"></i> 我什么时候能够访问课程视频与作业？</span>
+                                        <div class="drop-down">
+                                            <p>
+                                                课程安排灵活，课程费用支付提供180天全程准入和资格证书。自定进度课程建议的最后期限，但你不会受到惩罚错过期限，只要你赚你的证书在180天内。以会话为基础的课程可能要求你在截止日期前保持正轨，但如果你落后了，你可以切换到以后的会议，你完成的任何工作将与你转移。</p>
+                                        </div>
+                                    </li>
+                                    <li class="item"><span class="on-off"><i class="i-chevron-bot"></i> 如何需要额外的时间来完成课程会怎么样？</span>
+                                        <div class="drop-down">
+                                            <p>
+                                                课程安排灵活，课程费用支付提供180天全程准入和资格证书。自定进度课程建议的最后期限，但你不会受到惩罚错过期限，只要你赚你的证书在180天内。以会话为基础的课程可能要求你在截止日期前保持正轨，但如果你落后了，你可以切换到以后的会议，你完成的任何工作将与你转移。</p>
+                                        </div>
+                                    </li>
+                                    <li class="item"><span class="on-off"><i class="i-chevron-bot"></i> 我支付次课程之后会得到什么？</span>
+                                        <div class="drop-down">
+                                            <p>
+                                                课程安排灵活，课程费用支付提供180天全程准入和资格证书。自定进度课程建议的最后期限，但你不会受到惩罚错过期限，只要你赚你的证书在180天内。以会话为基础的课程可能要求你在截止日期前保持正轨，但如果你落后了，你可以切换到以后的会议，你完成的任何工作将与你转移。</p>
+                                        </div>
+                                    </li>
+                                    <li class="item"><span class="on-off"><i class="i-chevron-bot"></i> 退款条例是如何规定的？</span>
+                                        <div class="drop-down">
+                                            <p>
+                                                课程安排灵活，课程费用支付提供180天全程准入和资格证书。自定进度课程建议的最后期限，但你不会受到惩罚错过期限，只要你赚你的证书在180天内。以会话为基础的课程可能要求你在截止日期前保持正轨，但如果你落后了，你可以切换到以后的会议，你完成的任何工作将与你转移。</p>
+                                        </div>
+                                    </li>
+                                    <li class="item"><span class="on-off"><i
+                                                    class="i-chevron-bot"></i> 有助学金？</span>
+                                        <div class="drop-down">
+                                            <p>
+                                                课程安排灵活，课程费用支付提供180天全程准入和资格证书。自定进度课程建议的最后期限，但你不会受到惩罚错过期限，只要你赚你的证书在180天内。以会话为基础的课程可能要求你在截止日期前保持正轨，但如果你落后了，你可以切换到以后的会议，你完成的任何工作将与你转移。</p>
+                                        </div>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
-
-                    <!--侧边栏-->
-                    <!--#include virtual="/include/course_detail_side.html"-->
-                    <!--侧边栏-->
-
                 </div>
+                <!--侧边栏-->
+                <!--#include virtual="/include/course_detail_side.html"-->
+                <!--侧边栏-->
+
             </div>
             <div class="articleItem" style="display: none">
                 <div class="article-cont-catalog">
@@ -492,162 +489,159 @@
                 </div>
             </div>
             <div class="artcleCod" style="display: none;">
-                <div class="article-cont">
-                    <div class="article-left-box">
-                        <div class="comment-box">
-                            <div class="evaluate">
-                                <div class="eva-top">
-                                    <div class="tit">课程评分</div>
-                                    <div class="star">
-                                        <div class="score"><i>5</i></div>
-                                    </div>
-                                    <span class="star-score"> <i>5</i> 分</span></div>
-                                <div class="eva-cont">
-                                    <div class="tit">学员评语</div>
-                                    <div class="text-box">
-                                        <textarea class="form-control" rows="5"
-                                                  placeholder="扯淡、吐槽、表扬、鼓励......想说啥说啥！"></textarea>
-                                        <div class="text-right"><span>发表评论</span></div>
+
+                <div class="article-left-box">
+                    <div class="comment-box">
+                        <div class="evaluate">
+                            <div class="eva-top">
+                                <div class="tit">课程评分</div>
+                                <div class="star">
+                                    <div class="score">
+                                        <i>
+                                            5
+                                        </i>
                                     </div>
                                 </div>
+                                <template>
+                                    <div class="star-score"><i id="starRank">
+                                            {{ comment.starRank }}
+                                        </i></div>
+                                </template>
                             </div>
-                            <div class="course-evaluate">
-                                <div class="top-tit">评论
-                                    <span>
-                        <label><input name="eval" type="radio" value="" checked/> 所有学生 </label>
-                        <label><input name="eval" type="radio" value=""/> 完成者 </label>
-                    </span>
-                                </div>
-                                <div class="top-cont">
-                                    <div class="cont-top-left">
-                                        <div class="star-scor">
-                                            <div class="star-show">
-                                                <div class="score"><i>5</i></div>
-                                            </div>
-                                            <div class="scor">4.9分</div>
-                                        </div>
-                                        <div class="all-scor">总评分：12343</div>
-                                    </div>
-                                    <div class="cont-top-right">
-                                        <div class="star-grade">五星
-                                            <div class="grade">
-                                                <div class="grade-percent"><span></span></div>
-                                                <div class="percent-num"><i>95</i>%</div>
-                                            </div>
-                                        </div>
-                                        <div class="star-grade">四星
-                                            <div class="grade">
-                                                <div class="grade-percent"><span></span></div>
-                                                <div class="percent-num"><i>5</i>%</div>
-                                            </div>
-                                        </div>
-                                        <div class="star-grade">三星
-                                            <div class="grade">
-                                                <div class="grade-percent"><span></span></div>
-                                                <div class="percent-num"><i>0</i>%</div>
-                                            </div>
-                                        </div>
-                                        <div class="star-grade">二星
-                                            <div class="grade">
-                                                <div class="grade-percent"><span></span></div>
-                                                <div class="percent-num"><i>2</i>%</div>
-                                            </div>
-                                        </div>
-                                        <div class="star-grade">一星
-                                            <div class="grade">
-                                                <div class="grade-percent"><span></span></div>
-                                                <div class="percent-num"><i>1</i>%</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="comment-item-box">
-                                    <div class="title">评论 <span>12453条评论</span></div>
-                                    <div class="item">
-                                        <div class="item-left">
-                                            <p><img src="/static/img/widget-pic.png" width="60px" alt=""></p>
-                                            <p>毛老师</p>
-                                        </div>
-                                        <div class="item-cent">
-                                            <p>
-                                                很受用，如果再深入下就更好了。虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！</p>
-                                            <p class="time">2017-2-43</p>
-                                        </div>
-                                        <div class="item-rit">
-                                            <p>
-                                            <div class="star-show">
-                                                <div class="score"><i>4</i></div>
-                                            </div>
-                                            </p>
-                                            <p>评分 <span>5星</span></p>
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="item-left">
-                                            <p><img src="/static/img/widget-pic.png" width="60px" alt=""></p>
-                                            <p>毛老师</p>
-                                        </div>
-                                        <div class="item-cent">
-                                            <p>
-                                                很受用，如果再深入下就更好了。虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！</p>
-                                            <p class="time">2017-2-43</p>
-                                        </div>
-                                        <div class="item-rit">
-                                            <p>
-                                            <div class="star-show">
-                                                <div class="score"><i>5</i></div>
-                                            </div>
-                                            </p>
-                                            <p>评分 <span>5星</span></p>
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="item-left">
-                                            <p><img src="/static/img/widget-pic.png" width="60px" alt=""></p>
-                                            <p>毛老师</p>
-                                        </div>
-                                        <div class="item-cent">
-                                            <p>
-                                                很受用，如果再深入下就更好了。虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！</p>
-                                            <p class="time">2017-2-43</p>
-                                        </div>
-                                        <div class="item-rit">
-                                            <p>
-                                            <div class="star-show">
-                                                <div class="score"><i>5</i></div>
-                                            </div>
-                                            </p>
-                                            <p>评分 <span>5星</span></p>
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="item-left">
-                                            <p><img src="/static/img/widget-pic.png" width="60px" alt=""></p>
-                                            <p>毛老师</p>
-                                        </div>
-                                        <div class="item-cent">
-                                            <p>
-                                                很受用，如果再深入下就更好了。虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！虽然都是入门级别的，但是也很使用，后续就需要自己发挥了！</p>
-                                            <p class="time">2017-2-43</p>
-                                        </div>
-                                        <div class="item-rit">
-                                            <p>
-                                            <div class="star-show">
-                                                <div class="score"><i>5</i></div>
-                                            </div>
-                                            </p>
-                                            <p>评分 <span>5星</span></p>
-                                        </div>
-                                    </div>
-                                    <div class="get-more">页面加载中...</div>
+                            <div class="eva-cont">
+                                <div class="tit">学员评语</div>
+                                <div class="text-box">
+                                            <textarea v-model="comment.commentText" class="form-control" rows="5"
+                                                      placeholder="扯淡、吐槽、表扬、鼓励......想说啥说啥！"></textarea>
+                                    <div class="text-right"><span @click="submitComment">发表评论</span></div>
                                 </div>
                             </div>
                         </div>
+                        <div class="course-evaluate">
+                            <div class="top-tit">评论
+                            </div>
+                            <div class="top-cont">
+                                <div class="cont-top-left">
+                                    <div class="star-scor">
+                                        <div class="star">
+                                            <div class="score"
+                                                 :style="{ width: calculateWidth(courseScore.avgScore) + 'px'}">
+                                                <i>
+                                                    {{ courseScore.avgScore }}
+                                                </i>
+                                            </div>
+                                        </div>
+                                        <div class="scor">{{courseScore.avgScore}} 分</div>
+                                    </div>
+                                    <div class="all-scor">总评价人数：{{courseScore.peopleCount}} 人</div>
+                                    <div class="all-scor">总评分：{{courseScore.sumScore}} 分</div>
+                                </div>
+                                <div class="cont-top-right">
+                                    <div class="star-grade">五星
+                                        <div class="grade">
+                                            <div class="grade-percent"><span
+                                                        :style="{ width: calculateRankWidth(courseScore.fiveScore/courseScore.peopleCount*100) + 'px'}"></span>
+                                            </div>
+                                            <div class="percent-num">
+                                                <i>{{ courseScore.peopleCount == 0 ? 0 : (courseScore.fiveScore
+                                                    / courseScore.peopleCount * 100) }}</i>%
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="star-grade">四星
+                                        <div class="grade">
+                                            <div class="grade-percent"><span
+                                                        :style="{ width: calculateRankWidth(courseScore.fourScore/courseScore.peopleCount*100) + 'px'}"></span>
+                                            </div>
+                                            <div class="percent-num">
+                                                <i>{{ courseScore.peopleCount == 0 ? 0
+                                                    :courseScore.fourScore/courseScore.peopleCount*100}}</i>%
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="star-grade">三星
+                                        <div class="grade">
+                                            <div class="grade-percent"><span
+                                                        :style="{ width: calculateRankWidth(courseScore.threeScore/courseScore.peopleCount*100) + 'px'}"></span>
+                                            </div>
+                                            <div class="percent-num">
+                                                <i>{{courseScore.peopleCount == 0 ? 0
+                                                    :courseScore.threeScore/courseScore.peopleCount*100}}</i>%
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="star-grade">二星
+                                        <div class="grade">
+                                            <div class="grade-percent"><span
+                                                        :style="{ width: calculateRankWidth(courseScore.twoScore/courseScore.peopleCount*100) + 'px'}"></span>
+                                            </div>
+                                            <div class="percent-num">
+                                                <i>{{courseScore.peopleCount == 0 ? 0
+                                                    :courseScore.twoScore/courseScore.peopleCount*100}}</i>%
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="star-grade">一星
+                                        <div class="grade">
+                                            <div class="grade-percent"><span
+                                                        :style="{ width: calculateRankWidth(courseScore.oneScore/courseScore.peopleCount*100) + 'px'}"></span>
+                                            </div>
+                                            <div class="percent-num">
+                                                <i>{{courseScore.peopleCount == 0 ? 0
+                                                    :courseScore.oneScore/courseScore.peopleCount*100}}</i>%
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comment-item-box">
+                                <div class="title">评论 <span>{{ commentList.counts }}条评论</span></div>
+                                <template>
+                                    <div>
+                                        <div class="item" v-for="comment in commentList.items"
+                                             :key="comment.id">
+                                            <div class="item-left">
+                                                <p><img :src="getFullImageUrl(comment.userHead)" width="60px"
+                                                        alt=""></p>
+                                                <p>{{ comment.nickName }}</p>
+                                            </div>
+                                            <div class="item-cent">
+                                                <p>{{ comment.commentText }}</p>
+                                                <p class="time">{{ comment.createTime }}</p>
+                                            </div>
+                                            <div class="item-rit">
+                                                <p>
+                                                <div class="star">
+                                                    <div class="score"
+                                                         :style="{ width: calculateWidth(comment.starRank) + 'px'}">
+                                                        <i>
+                                                            {{ comment.starRank }}
+                                                        </i>
+                                                    </div>
+                                                </div>
+                                                </p>
+                                                <p>评分 <span>{{ comment.starRank }}星</span></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="page-item">
+                                <span @click="changePage(1)">首页</span>
+                                <span @click="changePage(currentPage - 1)">上一页</span>
+                                <span v-for="page in totalPages" :key="page"
+                                      :class="{ active: page === currentPage }" @click="changePage(page)">{{ page
+                                            }}</span>
+                                <span @click="changePage(currentPage + 1)">下一页</span>
+                                <span @click="changePage(totalPages)">尾页</span>
+                            </div>
+                        </div>
                     </div>
-                    <!--侧边栏-->
-                    <!--#include virtual="/include/course_detail_side.html"-->
-                    <!--侧边栏-->
                 </div>
+
+                <!--侧边栏-->
+                <!--#include virtual="/include/course_detail_side.html"-->
+                <!--侧边栏-->
             </div>
         </div>
     </div>

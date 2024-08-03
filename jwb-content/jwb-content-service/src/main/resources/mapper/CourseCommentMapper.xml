@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jwb.content.mapper.CourseCommentMapper">
+
+    <resultMap id="BaseResultMap" type="com.jwb.content.model.po.CourseComment">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="commentText" column="comment_text" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
+        <result property="starRank" column="star_rank" jdbcType="FLOAT"/>
+        <result property="courseId" column="course_id" jdbcType="BIGINT"/>
+        <result property="courseName" column="course_name" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="BIGINT"/>
+        <result property="userHead" column="user_head" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,comment_text,create_time,
+        nickName,starRank,course_id,
+        course_name,user_head
+    </sql>
+</mapper>

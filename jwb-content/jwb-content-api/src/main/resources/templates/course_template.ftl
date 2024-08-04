@@ -626,12 +626,19 @@
                                     </div>
                                 </template>
                             </div>
-                            <div class="page-item">
+                            <div v-if="totalPages==0" class="empty-wrap">
+                                <div class="empty-item"
+                                     style="text-align: center;padding-top: 80px;padding-bottom: 80px;"><img
+                                            width="200px" src="/file/mediafiles/moren/empty.png" alt="empty">
+                                    <p style="color:#b2b2b2;margin-top: 22px;font-size: 15px;">暂无评论</p>
+                                </div>
+                            </div>
+                            <div class="page-item" v-if="totalPages!=0">
                                 <span @click="changePage(1)">首页</span>
                                 <span @click="changePage(currentPage - 1)">上一页</span>
                                 <span v-for="page in totalPages" :key="page"
                                       :class="{ active: page === currentPage }" @click="changePage(page)">{{ page
-                                            }}</span>
+                                        }}</span>
                                 <span @click="changePage(currentPage + 1)">下一页</span>
                                 <span @click="changePage(totalPages)">尾页</span>
                             </div>

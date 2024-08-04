@@ -1,5 +1,6 @@
 package com.jwb.content.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,13 +16,18 @@ import com.jwb.content.model.po.CourseComment;
 import com.jwb.content.model.po.CourseScore;
 import com.jwb.content.service.CourseCommentService;
 import org.apache.commons.lang.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +47,11 @@ public class CourseCommentServiceImpl extends ServiceImpl<CourseCommentMapper, C
     private CourseScoreMapper courseScoreMapper;
     @Autowired
     private CourseCommentService courseCommentService;
+
+    @Autowired
+    StringRedisTemplate redisTemplate;
+    @Autowired
+    RedissonClient redissonClient;
 
     /**
      * 添加评论
@@ -113,6 +124,10 @@ public class CourseCommentServiceImpl extends ServiceImpl<CourseCommentMapper, C
         courseScore.setFiveScore(fiveStar);
 
         courseScoreMapper.updateById(courseScore);
+
+        // 信息同步更新到Redis 先更新后删除
+        String cacheKey = "course_score:" + courseId;
+        redisTemplate.delete(cacheKey);
     }
 
 
@@ -164,7 +179,40 @@ public class CourseCommentServiceImpl extends ServiceImpl<CourseCommentMapper, C
      */
     @Override
     public CourseScore getCourseScore(Long courseId) {
-        return courseScoreMapper.selectOne(new LambdaQueryWrapper<CourseScore>().eq(CourseScore::getCourseId, courseId));
+        String cacheKey = "course_score:" + courseId;
+        // 从缓存中查询
+        String courseScoreCacheJson = redisTemplate.opsForValue().get(cacheKey);
+        if (StringUtils.isNotEmpty(courseScoreCacheJson)) {
+            log.debug("从缓存中查询课程评分");
+            return "null".equals(courseScoreCacheJson) ? null : JSON.parseObject(courseScoreCacheJson, CourseScore.class);
+        }
+
+        // 加分布式锁防止缓存击穿和缓存雪崩
+        RLock lock = redissonClient.getLock("courseScoreQueryLock" + courseId);
+        lock.lock();
+        try {
+            // 再次从缓存中查询，避免并发时重复查询数据库
+            courseScoreCacheJson = redisTemplate.opsForValue().get(cacheKey);
+            if (StringUtils.isNotEmpty(courseScoreCacheJson)) {
+                log.debug("从缓存中查询课程评分");
+                return "null".equals(courseScoreCacheJson) ? null : JSON.parseObject(courseScoreCacheJson, CourseScore.class);
+            }
+
+            log.debug("缓存中没有课程评分，查询数据库");
+            CourseScore courseScore = courseScoreMapper.selectOne(new LambdaQueryWrapper<CourseScore>().eq(CourseScore::getCourseId, courseId));
+            if (courseScore == null) {
+                // 缓存空值防止缓存穿透
+                redisTemplate.opsForValue().set(cacheKey, "null", 5 + new Random().nextInt(10), TimeUnit.SECONDS);
+                return null;
+            }
+            // 缓存查询结果
+            String jsonString = JSON.toJSONString(courseScore);
+            // 过期时间加上一个随机值防止缓存雪崩
+            redisTemplate.opsForValue().set(cacheKey, jsonString, 900 + new Random().nextInt(100), TimeUnit.SECONDS);
+            return courseScore;
+        } finally {
+            lock.unlock();
+        }
     }
 }
 

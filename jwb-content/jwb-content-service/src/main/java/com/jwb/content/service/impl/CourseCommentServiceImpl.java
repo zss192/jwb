@@ -144,6 +144,16 @@ public class CourseCommentServiceImpl extends ServiceImpl<CourseCommentMapper, C
         LambdaQueryWrapper<CourseComment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(StringUtils.isNotEmpty(queryCommentDto.getCourseId()), CourseComment::getCourseId, queryCommentDto.getCourseId());
         queryWrapper.like(StringUtils.isNotEmpty(queryCommentDto.getCourseName()), CourseComment::getCourseName, queryCommentDto.getCourseName());
+        // 评分等级 -1差评(0-1) 0中评(2-4) 1好评(4-5)
+        if (queryCommentDto.getLevel() != null) {
+            if (queryCommentDto.getLevel() == -1) {
+                queryWrapper.lt(CourseComment::getStarRank, 2);
+            } else if (queryCommentDto.getLevel() == 0) {
+                queryWrapper.between(CourseComment::getStarRank, 2, 4);
+            } else if (queryCommentDto.getLevel() == 1) {
+                queryWrapper.ge(CourseComment::getStarRank, 4);
+            }
+        }
         //分页对象
         Page<CourseComment> page = new Page<>(pageParams.getPageNo(), pageParams.getPageSize());
         // 查询数据内容获得结果

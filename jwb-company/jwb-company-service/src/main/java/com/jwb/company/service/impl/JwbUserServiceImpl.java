@@ -26,12 +26,12 @@ public class JwbUserServiceImpl extends ServiceImpl<JwbUserMapper, JwbUser>
     JwbUserMapper jwbUserMapper;
 
     @Override
-    public PageResult<JwbUser> listMember(PageParams pageParams, Long companyId, String name, String cellphone, String status) {
+    public PageResult<JwbUser> listMember(PageParams pageParams, Long companyId, String username, String cellphone, String status) {
         //构建查询条件对象
         LambdaQueryWrapper<JwbUser> queryWrapper = new LambdaQueryWrapper<>();
         //构建查询条件
         queryWrapper.eq(JwbUser::getCompanyId, companyId);
-        queryWrapper.like(StringUtils.isNotEmpty(name), JwbUser::getName, name);
+        queryWrapper.like(StringUtils.isNotEmpty(username), JwbUser::getUsername, username);
         queryWrapper.like(StringUtils.isNotEmpty(cellphone), JwbUser::getCellphone, cellphone);
         queryWrapper.eq(StringUtils.isNotEmpty(status), JwbUser::getStatus, status);
 

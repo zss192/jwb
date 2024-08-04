@@ -11,7 +11,6 @@
         <result property="salt" column="salt" jdbcType="VARCHAR"/>
         <result property="third_unionid" column="third_unionid" jdbcType="VARCHAR"/>
         <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
-        <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="userpic" column="userpic" jdbcType="VARCHAR"/>
         <result property="companyId" column="company_id" jdbcType="VARCHAR"/>
         <result property="utype" column="utype" jdbcType="VARCHAR"/>

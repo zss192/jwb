@@ -53,12 +53,6 @@ public class JwbUser implements Serializable {
     private String nickname;
 
     /**
-     * 昵称
-     */
-    @TableField(value = "name")
-    private String name;
-
-    /**
      * 头像
      */
     @TableField(value = "userpic")

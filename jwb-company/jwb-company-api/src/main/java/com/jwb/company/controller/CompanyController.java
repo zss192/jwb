@@ -39,9 +39,9 @@ public class CompanyController {
 
     @GetMapping("/member/list")
     @ApiOperation("查询机构成员")
-    public PageResult<JwbUser> listMember(PageParams pageParams, String name, String cellphone, String status) {
+    public PageResult<JwbUser> listMember(PageParams pageParams, String username, String cellphone, String status) {
         Long companyId = 1232141425L;
-        return userService.listMember(pageParams, companyId, name, cellphone, status);
+        return userService.listMember(pageParams, companyId, username, cellphone, status);
     }
 
     // TODO：封禁的用户禁止登录并且立马清除其jwt

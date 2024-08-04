@@ -154,6 +154,7 @@ public class CourseCommentServiceImpl extends ServiceImpl<CourseCommentMapper, C
                 queryWrapper.ge(CourseComment::getStarRank, 4);
             }
         }
+        queryWrapper.orderByDesc(CourseComment::getCreateTime);
         //分页对象
         Page<CourseComment> page = new Page<>(pageParams.getPageNo(), pageParams.getPageSize());
         // 查询数据内容获得结果

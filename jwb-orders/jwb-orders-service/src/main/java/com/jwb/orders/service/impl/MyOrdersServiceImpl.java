@@ -118,6 +118,7 @@ public class MyOrdersServiceImpl implements MyOrdersService {
         queryWrapper.eq(StringUtils.isNotEmpty(queryOrdersDto.getUserId()), JwbOrders::getUserId, queryOrdersDto.getUserId());
         queryWrapper.ge(StringUtils.isNotEmpty(queryOrdersDto.getOrderStart()), JwbOrders::getCreateDate, queryOrdersDto.getOrderStart());
         queryWrapper.le(StringUtils.isNotEmpty(queryOrdersDto.getOrderEnd()), JwbOrders::getCreateDate, queryOrdersDto.getOrderEnd());
+        queryWrapper.orderByDesc(JwbOrders::getCreateDate);
         //分页对象
         Page<JwbOrders> page = new Page<>(pageParams.getPageNo(), pageParams.getPageSize());
         // 查询数据内容获得结果

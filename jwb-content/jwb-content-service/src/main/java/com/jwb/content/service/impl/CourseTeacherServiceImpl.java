@@ -53,16 +53,21 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
         LambdaQueryWrapper<CourseTeacher> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(CourseTeacher::getCourseId, courseBaseId);
         CourseTeacher courseTeacher = courseTeacherMapper.selectOne(queryWrapper);
+        // 根据教师id查询教师信息
+        JwbTeacher teacher = teacherServiceClient.getTeacher(String.valueOf(courseTeacherId));
+        String teacherName = teacher.getTeacherName();
         // 没有就插入,有就更新
         if (courseTeacher == null) {
             CourseTeacher newCourseTeacher = new CourseTeacher();
             newCourseTeacher.setTeacherId(courseTeacherId);
+            newCourseTeacher.setTeacherName(teacherName);
             newCourseTeacher.setCourseId(courseBaseId);
             newCourseTeacher.setCreateDate(LocalDateTime.now());
             newCourseTeacher.setUpdateTime(LocalDateTime.now());
             courseTeacherMapper.insert(newCourseTeacher);
         } else {
             courseTeacher.setTeacherId(courseTeacherId);
+            courseTeacher.setTeacherName(teacherName);
             courseTeacher.setUpdateTime(LocalDateTime.now());
             courseTeacherMapper.updateById(courseTeacher);
         }
@@ -75,23 +80,14 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
      * @return 课程id与教师信息的映射
      */
     @Override
-    public Map<Long, JwbTeacher> getCourseTeacherBatch(ArrayList<Long> courseIds) {
-        // 得到教师id和课程id的映射
+    public Map<Long, CourseTeacher> getCourseTeacherBatch(ArrayList<Long> courseIds) {
         List<CourseTeacher> courseTeachers = courseTeacherMapper.selectList(new LambdaQueryWrapper<CourseTeacher>().in(CourseTeacher::getCourseId, courseIds));
-        Map<Long, Long> courseTeacherMap = new HashMap<>();
+        Map<Long, CourseTeacher> courseTeacherMap = new HashMap<>();
         for (CourseTeacher courseTeacher : courseTeachers) {
-            courseTeacherMap.put(courseTeacher.getTeacherId(), courseTeacher.getCourseId());
+            courseTeacherMap.put(courseTeacher.getCourseId(), courseTeacher);
         }
-        // 用feign得到教师信息
-        Map<Long, JwbTeacher> teacherMap = teacherServiceClient.getTeacherBatch(new ArrayList<>(courseTeacherMap.keySet()));
-        // 得到的key是教师id,需要转换成课程id
-        Map<Long, JwbTeacher> teacherMapRes = new HashMap<>();
-        for (Map.Entry<Long, JwbTeacher> entry : teacherMap.entrySet()) {
-            Long teacherId = entry.getKey();
-            Long courseId = courseTeacherMap.get(teacherId);
-            teacherMapRes.put(courseId, entry.getValue());
-        }
-        return teacherMapRes;
+
+        return courseTeacherMap;
     }
 
     public CourseTeacher getCourseTeacher(CourseTeacher courseTeacher) {

@@ -8,12 +8,8 @@
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="courseId" column="course_id" jdbcType="BIGINT"/>
         <result property="teacherId" column="teacher_id" jdbcType="BIGINT"/>
+        <result property="teacherName" column="teacher_name" jdbcType="VARCHAR"/>
         <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
-
-    <sql id="Base_Column_List">
-        id,course_id,teacher_id,
-        create_date,update_time
-    </sql>
 </mapper>

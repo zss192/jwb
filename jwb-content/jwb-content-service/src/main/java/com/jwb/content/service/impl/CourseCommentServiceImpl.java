@@ -139,7 +139,7 @@ public class CourseCommentServiceImpl extends ServiceImpl<CourseCommentMapper, C
         List<CourseScore> courseScoreList = courseScoreMapper.selectByIds(courseIds);
         Map<Long, CourseScore> courseScoreMap = new HashMap<>();
         for (CourseScore courseScore : courseScoreList) {
-            courseScoreMap.put(courseScore.getId(), courseScore);
+            courseScoreMap.put(courseScore.getCourseId(), courseScore);
         }
         return courseScoreMap;
     }

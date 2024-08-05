@@ -1,5 +1,6 @@
 package com.jwb.content.service;
 
+import com.jwb.content.model.po.CourseTeacher;
 import com.jwb.content.model.po.JwbTeacher;
 
 import java.util.ArrayList;
@@ -18,5 +19,5 @@ public interface CourseTeacherService {
      * @param courseIds 课程id列表
      * @return 课程id与教师信息的映射
      */
-    Map<Long, JwbTeacher> getCourseTeacherBatch(ArrayList<Long> courseIds);
+    Map<Long, CourseTeacher> getCourseTeacherBatch(ArrayList<Long> courseIds);
 }

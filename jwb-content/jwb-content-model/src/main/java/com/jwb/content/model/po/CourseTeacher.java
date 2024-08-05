@@ -29,6 +29,11 @@ public class CourseTeacher implements Serializable {
     private Long teacherId;
 
     /**
+     * 教师姓名
+     */
+    private String teacherName;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createDate;

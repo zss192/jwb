@@ -1,5 +1,6 @@
 package com.jwb.content.api;
 
+import com.jwb.content.model.po.CourseTeacher;
 import com.jwb.content.model.po.JwbTeacher;
 import com.jwb.content.service.CourseTeacherService;
 import io.swagger.annotations.Api;
@@ -27,7 +28,7 @@ public class CourseTeacherController {
 
     @ApiOperation("批量查询教师信息接口")
     @GetMapping("/courseTeacher/batch")
-    public Map<Long, JwbTeacher> getCourseTeacherBatch(@RequestParam("courseIds") ArrayList<Long> courseIds) {
+    public Map<Long, CourseTeacher> getCourseTeacherBatch(@RequestParam("courseIds") ArrayList<Long> courseIds) {
         return courseTeacherService.getCourseTeacherBatch(courseIds);
     }
 

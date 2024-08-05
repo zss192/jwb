@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jwb.base.exception.JwbException;
 import com.jwb.base.model.PageResult;
 import com.jwb.content.model.po.CoursePublish;
+import com.jwb.content.model.po.CourseScore;
+import com.jwb.content.model.po.CourseTeacher;
 import com.jwb.learning.feignclient.ContentServiceClient;
 import com.jwb.learning.mapper.JwbChooseCourseMapper;
 import com.jwb.learning.mapper.JwbCourseTablesMapper;
@@ -19,12 +21,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.Map;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,6 +42,9 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
     JwbChooseCourseMapper chooseCourseMapper;
     @Autowired
     JwbCourseTablesMapper courseTablesMapper;
+    @Autowired
+    @Qualifier("threadPoolExecutor")
+    private ExecutorService threadPool;
 
     @Override
     @Transactional
@@ -249,60 +257,115 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
         return true;
     }
 
+    /**
+     * 分页查询我的课程表
+     * <p>
+     * 使用 CompletableFuture 版本
+     * <p>
+     *
+     * @param params 查询参数
+     * @return 分页查询结果
+     */
     @Override
     public PageResult<MyCourseTableItemDto> myCourseTables(MyCourseTableParams params) {
-        // 1. 获取页码
+        // 查询课程表
+        Page<JwbCourseTables> pageResult = queryCourseTables(params);
+
+        // 获取课程ID列表
+        List<Long> courseIds = pageResult.getRecords().stream()
+                .map(JwbCourseTables::getCourseId)
+                .collect(Collectors.toList());
+
+        // 查询课程发布表、课程评分表和课程教师表，使用自定义线程池，并返回 CompletableFuture
+        CompletableFuture<Map<Long, CoursePublish>> coursePublishFuture = CompletableFuture.supplyAsync(
+                () -> contentServiceClient.getCoursePublishBatch(new ArrayList<>(courseIds)), threadPool);
+        CompletableFuture<Map<Long, CourseScore>> courseScoreFuture = CompletableFuture.supplyAsync(
+                () -> contentServiceClient.getCourseScoreBatch(new ArrayList<>(courseIds)), threadPool);
+        CompletableFuture<Map<Long, CourseTeacher>> courseTeacherFuture = CompletableFuture.supplyAsync(
+                () -> contentServiceClient.getCourseTeacherBatch(new ArrayList<>(courseIds)), threadPool);
+
+        // 等待所有 CompletableFuture 完成
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(coursePublishFuture, courseScoreFuture, courseTeacherFuture);
+
+        // 等待所有任务完成，超时时间为5秒
+        try {
+            allFutures.get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            JwbException.cast("查询我的课程表超时");
+        }
+
+        // 获取查询结果并构建DTO列表
+        Map<Long, CoursePublish> coursePublishMap = coursePublishFuture.join();
+        Map<Long, CourseScore> courseScoreMap = courseScoreFuture.join();
+        Map<Long, CourseTeacher> courseTeacherMap = courseTeacherFuture.join();
+
+        List<MyCourseTableItemDto> dtoRecords = buildDtoRecords(pageResult.getRecords(), coursePublishMap, courseScoreMap, courseTeacherMap);
+        long total = pageResult.getTotal();
+        return new PageResult<>(dtoRecords, total, params.getPage(), params.getSize());
+    }
+
+    // 查询课程表
+    private Page<JwbCourseTables> queryCourseTables(MyCourseTableParams params) {
         int pageNo = params.getPage();
-        // 2. 设置每页记录数，固定为4
         long pageSize = params.getSize();
-        // 3. 分页条件
-        Page<JwbCourseTables> page = new Page<>(pageNo, pageSize);
-        // 4. 根据用户id查询课程
         String userId = params.getUserId();
+
+        Page<JwbCourseTables> page = new Page<>(pageNo, pageSize);
         LambdaQueryWrapper<JwbCourseTables> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(JwbCourseTables::getUserId, userId);
-        // 若课程类型不为空，则根据课程类型查询
         if (StringUtils.isNotEmpty(params.getCourseType())) {
             queryWrapper.eq(JwbCourseTables::getCourseType, params.getCourseType());
         }
-        // 若过期类型不为空，则根据过期类型查询
         if (StringUtils.isNotEmpty(params.getExpiresType())) {
             if ("1".equals(params.getExpiresType())) {
-                // 即将过期是离过期时间小于等于7天
                 queryWrapper.between(JwbCourseTables::getValidtimeEnd, LocalDateTime.now(), LocalDateTime.now().plusDays(7));
             } else if ("2".equals(params.getExpiresType())) {
-                // 已经过期是离当前时间大于过期时间
                 queryWrapper.lt(JwbCourseTables::getValidtimeEnd, LocalDateTime.now());
             }
         }
         queryWrapper.orderByDesc(JwbCourseTables::getCreateDate);
-        // 5. 分页查询
-        Page<JwbCourseTables> pageResult = courseTablesMapper.selectPage(page, queryWrapper);
-        // 根据查到的记录的courseId查询课程信息
-        List<JwbCourseTables> records = pageResult.getRecords();
+        return courseTablesMapper.selectPage(page, queryWrapper);
+    }
 
-        // 使用CompletableFuture并行查询课程信息
-        List<CompletableFuture<MyCourseTableItemDto>> futures = records.stream().map(record ->
-                CompletableFuture.supplyAsync(() -> {
-                    // 查询课程基本信息
-                    CompletableFuture<CoursePublish> coursePublishFuture = CompletableFuture.supplyAsync(() -> contentServiceClient.getCoursePublish(record.getCourseId()));
-                    // 等待所有异步任务完成
-                    CoursePublish coursePublish = coursePublishFuture.join();
+    // 构建DTO列表
+    private List<MyCourseTableItemDto> buildDtoRecords(List<JwbCourseTables> records, Map<Long, CoursePublish> coursePublishMap,
+                                                       Map<Long, CourseScore> courseScoreMap, Map<Long, CourseTeacher> courseTeacherMap) {
+        return records.stream().map(record -> {
+            Long courseId = record.getCourseId();
+            MyCourseTableItemDto dto = new MyCourseTableItemDto();
+            BeanUtils.copyProperties(record, dto);
+            dto.setPic(coursePublishMap.getOrDefault(courseId, new CoursePublish()).getPic());
+            dto.setAvgScore(courseScoreMap.getOrDefault(courseId, new CourseScore()).getAvgScore());
+            dto.setTeacherName(courseTeacherMap.getOrDefault(courseId, new CourseTeacher()).getTeacherName());
+            return dto;
+        }).collect(Collectors.toList());
+    }
 
-                    // 构建DTO
-                    MyCourseTableItemDto dto = new MyCourseTableItemDto();
-                    BeanUtils.copyProperties(record, dto);
-                    dto.setPic(coursePublish.getPic());
-                    return dto;
-                })
-        ).collect(Collectors.toList());
 
-        // 等待所有异步任务完成并收集结果
-        List<MyCourseTableItemDto> dtoRecords = futures.stream()
-                .map(CompletableFuture::join)
+    /**
+     * 分页查询我的课程表
+     * <p>
+     * 不使用 CompletableFuture版本（用作查询对比）
+     * <p>
+     *
+     * @param params 查询参数
+     * @return 分页查询结果
+     */
+    public PageResult<MyCourseTableItemDto> myCourseTablesOld(MyCourseTableParams params) {
+        Page<JwbCourseTables> pageResult = queryCourseTables(params);
+        List<Long> courseIds = pageResult.getRecords().stream()
+                .map(JwbCourseTables::getCourseId)
                 .collect(Collectors.toList());
 
+        // 批量查询课程信息，这里用的串行查询
+        Map<Long, CoursePublish> coursePublishMap = contentServiceClient.getCoursePublishBatch(new ArrayList<>(courseIds));
+        Map<Long, CourseScore> courseScoreMap = contentServiceClient.getCourseScoreBatch(new ArrayList<>(courseIds));
+        Map<Long, CourseTeacher> courseTeacherMap = contentServiceClient.getCourseTeacherBatch(new ArrayList<>(courseIds));
+
+        List<MyCourseTableItemDto> dtoRecords = buildDtoRecords(pageResult.getRecords(), coursePublishMap, courseScoreMap, courseTeacherMap);
         long total = pageResult.getTotal();
-        return new PageResult<>(dtoRecords, total, pageNo, pageSize);
+        return new PageResult<>(dtoRecords, total, params.getPage(), params.getSize());
     }
+
+
 }

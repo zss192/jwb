@@ -33,8 +33,17 @@ public interface MyCourseTablesService {
 
     /**
      * 我的课程表
+     * 使用 CompletableFuture版本
      *
      * @param params
      */
     PageResult<MyCourseTableItemDto> myCourseTables(MyCourseTableParams params);
+
+    /**
+     * 我的课程表
+     * 不使用 CompletableFuture版本（用作查询对比）
+     *
+     * @param params
+     */
+    PageResult<MyCourseTableItemDto> myCourseTablesOld(MyCourseTableParams params);
 }

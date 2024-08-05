@@ -1,7 +1,7 @@
 package com.jwb.content.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jwb.content.model.po.CourseBase;
+import com.jwb.content.model.dto.CourseFavoriteDto;
 import com.jwb.content.model.po.CourseFavorite;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public interface CourseFavoriteMapper extends BaseMapper<CourseFavorite> {
      * @return 用户收藏课程列表
      */
 
-    List<CourseBase> getCourseFavoriteList(Long userId);
+    List<CourseFavoriteDto> getCourseFavoriteList(Long userId);
 }
 
 

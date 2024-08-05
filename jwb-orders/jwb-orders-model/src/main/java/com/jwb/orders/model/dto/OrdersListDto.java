@@ -10,4 +10,5 @@ import lombok.ToString;
 public class OrdersListDto {
     private JwbOrders orders;
     private CourseBase courseBase;
+    private Double avgScore; // 评分
 }

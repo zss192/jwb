@@ -1,6 +1,6 @@
 package com.jwb.content.api;
 
-import com.jwb.content.model.po.CourseBase;
+import com.jwb.content.model.dto.CourseFavoriteDto;
 import com.jwb.content.service.CourseFavoriteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,7 +32,7 @@ public class CourseFavoriteController {
 
     @ApiOperation("查询用户收藏课程列表")
     @GetMapping("/course/favorite/list")
-    public List<CourseBase> getCourseFavoriteList(Long userId) {
+    public List<CourseFavoriteDto> getCourseFavoriteList(Long userId) {
         return courseFavoriteService.getCourseFavoriteList(userId);
     }
 }

@@ -12,6 +12,7 @@ import com.jwb.orders.mapper.JwbOrdersMapper;
 import com.jwb.orders.model.dto.OrdersListDto;
 import com.jwb.orders.model.dto.QueryOrdersDto;
 import com.jwb.orders.model.po.CourseBase;
+import com.jwb.orders.model.po.CourseScore;
 import com.jwb.orders.model.po.JwbOrders;
 import com.jwb.orders.model.po.JwbOrdersGoods;
 import com.jwb.orders.service.MyOrdersService;
@@ -54,19 +55,25 @@ public class MyOrdersServiceImpl implements MyOrdersService {
                 .orderByDesc(JwbOrders::getCreateDate));
 
         orders.forEach(order -> {
-            // 取出order_detail中的goodsId去查课程基本信息
-            // [{"goodsId":"1818933396148207618","goodsType":"60201","goodsName":"前端Web开发HTML5+CSS3视频教程","goodsPrice":35}]
-            String orderDetail = order.getOrderDetail();
-            // 解析json,，取出goodsId
-            List<JwbOrdersGoods> ordersGoodsList = JSON.parseArray(orderDetail, JwbOrdersGoods.class);
-            String courseId = ordersGoodsList.get(0).getGoodsId();
-            CourseBase courseBase = contentServiceClient.getCourseBaseById(Long.valueOf(courseId));
-            OrdersListDto ordersListDto = new OrdersListDto();
-            ordersListDto.setOrders(order);
-            ordersListDto.setCourseBase(courseBase);
+            OrdersListDto ordersListDto = createOrdersListDto(order);
             ordersList.add(ordersListDto);
         });
         return ordersList;
+    }
+
+    private OrdersListDto createOrdersListDto(JwbOrders order) {
+        // 取出order_detail中的goodsId去查课程基本信息
+        String orderDetail = order.getOrderDetail();
+        // 解析json,，取出goodsId
+        List<JwbOrdersGoods> ordersGoodsList = JSON.parseArray(orderDetail, JwbOrdersGoods.class);
+        String courseId = ordersGoodsList.get(0).getGoodsId();
+        CourseBase courseBase = contentServiceClient.getCourseBaseById(Long.valueOf(courseId));
+        CourseScore courseScore = contentServiceClient.getCourseScore(Long.valueOf(courseId));
+        OrdersListDto ordersListDto = new OrdersListDto();
+        ordersListDto.setOrders(order);
+        ordersListDto.setCourseBase(courseBase);
+        ordersListDto.setAvgScore(courseScore == null ? 0 : courseScore.getAvgScore());
+        return ordersListDto;
     }
 
     /**

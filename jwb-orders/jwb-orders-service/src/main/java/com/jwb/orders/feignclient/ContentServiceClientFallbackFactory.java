@@ -1,6 +1,7 @@
 package com.jwb.orders.feignclient;
 
 import com.jwb.orders.model.dto.CourseBaseInfoDto;
+import com.jwb.orders.model.po.CourseScore;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,12 @@ public class ContentServiceClientFallbackFactory implements FallbackFactory<Cont
         return new ContentServiceClient() {
             @Override
             public CourseBaseInfoDto getCourseBaseById(@PathVariable("courseId") Long courseId) {
+                log.debug("熔断处理，熔断异常：{}", throwable.getMessage());
+                return null;
+            }
+
+            @Override
+            public CourseScore getCourseScore(@PathVariable("courseId") Long courseId) {
                 log.debug("熔断处理，熔断异常：{}", throwable.getMessage());
                 return null;
             }

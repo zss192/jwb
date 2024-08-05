@@ -15,9 +15,15 @@
         id,user_id,course_id,
         create_time
     </sql>
-    <select id="getCourseFavoriteList" resultType="com.jwb.content.model.po.CourseBase">
-        select *
-        from course_base
-        where id in (select course_id from course_favorite where user_id = #{userId})
+    <select id="getCourseFavoriteList" resultType="com.jwb.content.model.dto.CourseFavoriteDto">
+        select b.id,
+               b.name,
+               b.description,
+               b.pic,
+               ifnull(s.avg_score, 0) avgScore
+        from course_base b
+                 LEFT JOIN course_score s on b.id = s.course_id
+        WHERE b.id in (select course_id from course_favorite where user_id = #{userId})
     </select>
+
 </mapper>

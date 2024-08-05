@@ -1,7 +1,7 @@
 package com.jwb.content.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jwb.content.model.po.CourseBase;
+import com.jwb.content.model.dto.CourseFavoriteDto;
 import com.jwb.content.model.po.CourseFavorite;
 
 import java.util.List;
@@ -37,5 +37,5 @@ public interface CourseFavoriteService extends IService<CourseFavorite> {
      * @param userId 用户id
      * @return 用户收藏课程列表
      */
-    List<CourseBase> getCourseFavoriteList(Long userId);
+    List<CourseFavoriteDto> getCourseFavoriteList(Long userId);
 }

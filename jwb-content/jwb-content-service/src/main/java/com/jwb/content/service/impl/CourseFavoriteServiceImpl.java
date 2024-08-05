@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jwb.base.exception.JwbException;
 import com.jwb.content.mapper.CourseBaseMapper;
 import com.jwb.content.mapper.CourseFavoriteMapper;
+import com.jwb.content.model.dto.CourseFavoriteDto;
 import com.jwb.content.model.po.CourseBase;
 import com.jwb.content.model.po.CourseFavorite;
 import com.jwb.content.service.CourseFavoriteService;
@@ -107,7 +108,7 @@ public class CourseFavoriteServiceImpl extends ServiceImpl<CourseFavoriteMapper,
      * @return 用户收藏课程列表
      */
     @Override
-    public List<CourseBase> getCourseFavoriteList(Long userId) {
+    public List<CourseFavoriteDto> getCourseFavoriteList(Long userId) {
         return courseFavoriteMapper.getCourseFavoriteList(userId);
     }
 }

@@ -3,8 +3,8 @@ package com.jwb.learning.service;
 import com.jwb.base.model.PageResult;
 import com.jwb.learning.model.dto.JwbChooseCourseDto;
 import com.jwb.learning.model.dto.JwbCourseTablesDto;
+import com.jwb.learning.model.dto.MyCourseTableItemDto;
 import com.jwb.learning.model.dto.MyCourseTableParams;
-import com.jwb.learning.model.po.JwbCourseTables;
 
 public interface MyCourseTablesService {
     /**
@@ -36,5 +36,5 @@ public interface MyCourseTablesService {
      *
      * @param params
      */
-    PageResult<JwbCourseTables> myCourseTables(MyCourseTableParams params);
+    PageResult<MyCourseTableItemDto> myCourseTables(MyCourseTableParams params);
 }

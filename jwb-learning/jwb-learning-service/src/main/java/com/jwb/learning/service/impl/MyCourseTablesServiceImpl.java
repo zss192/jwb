@@ -10,11 +10,13 @@ import com.jwb.learning.mapper.JwbChooseCourseMapper;
 import com.jwb.learning.mapper.JwbCourseTablesMapper;
 import com.jwb.learning.model.dto.JwbChooseCourseDto;
 import com.jwb.learning.model.dto.JwbCourseTablesDto;
+import com.jwb.learning.model.dto.MyCourseTableItemDto;
 import com.jwb.learning.model.dto.MyCourseTableParams;
 import com.jwb.learning.model.po.JwbChooseCourse;
 import com.jwb.learning.model.po.JwbCourseTables;
 import com.jwb.learning.service.MyCourseTablesService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -246,24 +250,59 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
     }
 
     @Override
-    public PageResult<JwbCourseTables> myCourseTables(MyCourseTableParams params) {
+    public PageResult<MyCourseTableItemDto> myCourseTables(MyCourseTableParams params) {
         // 1. 获取页码
         int pageNo = params.getPage();
         // 2. 设置每页记录数，固定为4
-        long pageSize = 4;
+        long pageSize = params.getSize();
         // 3. 分页条件
         Page<JwbCourseTables> page = new Page<>(pageNo, pageSize);
         // 4. 根据用户id查询课程
         String userId = params.getUserId();
         LambdaQueryWrapper<JwbCourseTables> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(JwbCourseTables::getUserId, userId);
+        // 若课程类型不为空，则根据课程类型查询
+        if (StringUtils.isNotEmpty(params.getCourseType())) {
+            queryWrapper.eq(JwbCourseTables::getCourseType, params.getCourseType());
+        }
+        // 若过期类型不为空，则根据过期类型查询
+        if (StringUtils.isNotEmpty(params.getExpiresType())) {
+            if ("1".equals(params.getExpiresType())) {
+                // 即将过期是离过期时间小于等于7天
+                queryWrapper.between(JwbCourseTables::getValidtimeEnd, LocalDateTime.now(), LocalDateTime.now().plusDays(7));
+            } else if ("2".equals(params.getExpiresType())) {
+                // 已经过期是离当前时间大于过期时间
+                queryWrapper.lt(JwbCourseTables::getValidtimeEnd, LocalDateTime.now());
+            }
+        }
+        queryWrapper.orderByDesc(JwbCourseTables::getCreateDate);
         // 5. 分页查询
         Page<JwbCourseTables> pageResult = courseTablesMapper.selectPage(page, queryWrapper);
-        // 6. 获取记录总数
-        long total = pageResult.getTotal();
-        // 7. 获取记录
+        // 根据查到的记录的courseId查询课程信息
         List<JwbCourseTables> records = pageResult.getRecords();
-        // 8. 封装返回
-        return new PageResult<>(records, total, pageNo, pageSize);
+
+        // 使用CompletableFuture并行查询课程信息
+        List<CompletableFuture<MyCourseTableItemDto>> futures = records.stream().map(record ->
+                CompletableFuture.supplyAsync(() -> {
+                    // 查询课程基本信息
+                    CompletableFuture<CoursePublish> coursePublishFuture = CompletableFuture.supplyAsync(() -> contentServiceClient.getCoursePublish(record.getCourseId()));
+                    // 等待所有异步任务完成
+                    CoursePublish coursePublish = coursePublishFuture.join();
+
+                    // 构建DTO
+                    MyCourseTableItemDto dto = new MyCourseTableItemDto();
+                    BeanUtils.copyProperties(record, dto);
+                    dto.setPic(coursePublish.getPic());
+                    return dto;
+                })
+        ).collect(Collectors.toList());
+
+        // 等待所有异步任务完成并收集结果
+        List<MyCourseTableItemDto> dtoRecords = futures.stream()
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
+
+        long total = pageResult.getTotal();
+        return new PageResult<>(dtoRecords, total, pageNo, pageSize);
     }
 }

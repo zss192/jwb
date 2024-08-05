@@ -33,5 +33,17 @@ public class MyCourseTableItemDto extends JwbCourseTables {
      */
     private String teachplanName;
 
+    /**
+     * 课程封面
+     */
+    private String pic;
 
+    /**
+     * 课程教师
+     */
+    private String teacherName;
+    /**
+     * 课程评分
+     */
+    private Double avgScore;
 }

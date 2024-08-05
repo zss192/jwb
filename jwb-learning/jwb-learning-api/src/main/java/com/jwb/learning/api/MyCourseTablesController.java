@@ -4,8 +4,8 @@ import com.jwb.base.exception.JwbException;
 import com.jwb.base.model.PageResult;
 import com.jwb.learning.model.dto.JwbChooseCourseDto;
 import com.jwb.learning.model.dto.JwbCourseTablesDto;
+import com.jwb.learning.model.dto.MyCourseTableItemDto;
 import com.jwb.learning.model.dto.MyCourseTableParams;
-import com.jwb.learning.model.po.JwbCourseTables;
 import com.jwb.learning.service.MyCourseTablesService;
 import com.jwb.learning.util.SecurityUtil;
 import io.swagger.annotations.Api;
@@ -40,7 +40,7 @@ public class MyCourseTablesController {
 
     @ApiOperation("我的课程表")
     @GetMapping("/mycoursetable")
-    public PageResult<JwbCourseTables> mycoursetable(MyCourseTableParams params) {
+    public PageResult<MyCourseTableItemDto> mycoursetable(MyCourseTableParams params) {
         SecurityUtil.XcUser user = SecurityUtil.getUser();
         if (user == null) {
             JwbException.cast("请登录后查看课程表");

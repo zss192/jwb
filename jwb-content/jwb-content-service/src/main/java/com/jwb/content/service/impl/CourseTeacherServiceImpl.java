@@ -12,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -62,6 +66,32 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
             courseTeacher.setUpdateTime(LocalDateTime.now());
             courseTeacherMapper.updateById(courseTeacher);
         }
+    }
+
+    /**
+     * 批量查询教师信息
+     *
+     * @param courseIds 课程id列表
+     * @return 课程id与教师信息的映射
+     */
+    @Override
+    public Map<Long, JwbTeacher> getCourseTeacherBatch(ArrayList<Long> courseIds) {
+        // 得到教师id和课程id的映射
+        List<CourseTeacher> courseTeachers = courseTeacherMapper.selectList(new LambdaQueryWrapper<CourseTeacher>().in(CourseTeacher::getCourseId, courseIds));
+        Map<Long, Long> courseTeacherMap = new HashMap<>();
+        for (CourseTeacher courseTeacher : courseTeachers) {
+            courseTeacherMap.put(courseTeacher.getTeacherId(), courseTeacher.getCourseId());
+        }
+        // 用feign得到教师信息
+        Map<Long, JwbTeacher> teacherMap = teacherServiceClient.getTeacherBatch(new ArrayList<>(courseTeacherMap.keySet()));
+        // 得到的key是教师id,需要转换成课程id
+        Map<Long, JwbTeacher> teacherMapRes = new HashMap<>();
+        for (Map.Entry<Long, JwbTeacher> entry : teacherMap.entrySet()) {
+            Long teacherId = entry.getKey();
+            Long courseId = courseTeacherMap.get(teacherId);
+            teacherMapRes.put(courseId, entry.getValue());
+        }
+        return teacherMapRes;
     }
 
     public CourseTeacher getCourseTeacher(CourseTeacher courseTeacher) {

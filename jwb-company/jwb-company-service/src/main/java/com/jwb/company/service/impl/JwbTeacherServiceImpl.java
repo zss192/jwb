@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zss
@@ -62,6 +65,22 @@ public class JwbTeacherServiceImpl extends ServiceImpl<JwbTeacherMapper, JwbTeac
         queryWrapper.orderByDesc("count");
         queryWrapper.last("LIMIT " + count);
         return jwbTeacherMapper.selectList(queryWrapper);
+    }
+
+    /**
+     * 批量查询教师
+     *
+     * @param ids id列表
+     * @return 教师信息
+     */
+    @Override
+    public Map<Long, JwbTeacher> getTeacherBatch(ArrayList<Long> ids) {
+        List<JwbTeacher> jwbTeacherList = jwbTeacherMapper.selectByIds(ids);
+        Map<Long, JwbTeacher> jwbTeacherMap = new HashMap<>();
+        for (JwbTeacher jwbTeacher : jwbTeacherList) {
+            jwbTeacherMap.put(Long.valueOf(jwbTeacher.getId()), jwbTeacher);
+        }
+        return jwbTeacherMap;
     }
 }
 

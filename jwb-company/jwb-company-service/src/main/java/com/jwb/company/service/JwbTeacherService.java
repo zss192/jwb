@@ -3,7 +3,9 @@ package com.jwb.company.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jwb.company.model.po.JwbTeacher;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zss
@@ -19,4 +21,12 @@ public interface JwbTeacherService extends IService<JwbTeacher> {
     List<JwbTeacher> getTeacherList();
 
     List<JwbTeacher> getTeacherRank(Long count);
+
+    /**
+     * 批量查询教师
+     *
+     * @param ids id列表
+     * @return 教师信息
+     */
+    Map<Long, JwbTeacher> getTeacherBatch(ArrayList<Long> ids);
 }

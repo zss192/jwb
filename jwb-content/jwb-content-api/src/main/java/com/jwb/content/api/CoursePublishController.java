@@ -9,11 +9,11 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -52,6 +52,12 @@ public class CoursePublishController {
     @GetMapping("/r/coursepublish/{courseId}")
     public CoursePublish getCoursePublish(@PathVariable("courseId") Long courseId) {
         return coursePublishService.getCoursePublish(courseId);
+    }
+
+    @ApiOperation("批量查询课程发布信息")
+    @GetMapping("/r/coursepublish/batch")
+    public Map<Long, CoursePublish> getCoursePublishBatch(@RequestParam("courseIds") ArrayList<Long> courseIds) {
+        return coursePublishService.getCoursePublishBatch(courseIds);
     }
 
     @ApiOperation("获取课程发布信息")

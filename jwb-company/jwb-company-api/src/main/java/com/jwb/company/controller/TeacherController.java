@@ -8,7 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -28,6 +30,12 @@ public class TeacherController {
     @GetMapping("/teacher/{id}")
     public JwbTeacher getTeacher(@PathVariable String id) {
         return jwbTeacherService.getTeacher(id);
+    }
+
+    @ApiOperation(value = "批量查询教师", tags = "批量查询教师")
+    @GetMapping("/teacher/list/batch")
+    public Map<Long, JwbTeacher> getTeacherBatch(@RequestParam("ids") ArrayList<Long> ids) {
+        return jwbTeacherService.getTeacherBatch(ids);
     }
 
     @ApiOperation(value = "查询所有教师", tags = "查询所有教师")

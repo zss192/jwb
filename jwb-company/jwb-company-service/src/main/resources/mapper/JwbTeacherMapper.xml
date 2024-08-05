@@ -14,4 +14,10 @@
         <result property="createTime" column="create_date" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
+    <select id="selectByIds" resultType="com.jwb.company.model.po.JwbTeacher">
+        SELECT * FROM jwb_teacher WHERE id IN
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

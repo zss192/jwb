@@ -24,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -128,6 +126,22 @@ public class CourseCommentServiceImpl extends ServiceImpl<CourseCommentMapper, C
         // 信息同步更新到Redis 先更新后删除
         String cacheKey = "course_score:" + courseId;
         redisTemplate.delete(cacheKey);
+    }
+
+    /**
+     * 批量获取课程评分
+     *
+     * @param courseIds 课程id列表
+     * @return 课程评分
+     */
+    @Override
+    public Map<Long, CourseScore> getCourseScoreBatch(ArrayList<Long> courseIds) {
+        List<CourseScore> courseScoreList = courseScoreMapper.selectByIds(courseIds);
+        Map<Long, CourseScore> courseScoreMap = new HashMap<>();
+        for (CourseScore courseScore : courseScoreList) {
+            courseScoreMap.put(courseScore.getId(), courseScore);
+        }
+        return courseScoreMap;
     }
 
 

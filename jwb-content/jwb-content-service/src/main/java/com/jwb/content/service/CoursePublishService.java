@@ -4,6 +4,8 @@ import com.jwb.content.model.dto.CoursePreviewDto;
 import com.jwb.content.model.po.CoursePublish;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * 课程预览、发布接口
@@ -69,4 +71,11 @@ public interface CoursePublishService {
      * @param courseId
      */
     CoursePublish getCoursePublishCache(Long courseId);
+
+    /**
+     * 批量查询课程发布信息
+     *
+     * @param courseIds 课程id集合
+     */
+    Map<Long, CoursePublish> getCoursePublishBatch(ArrayList<Long> courseIds);
 }

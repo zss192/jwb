@@ -11,6 +11,9 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 @RestController
 @Api(value = "课程评论接口", tags = "课程评论接口")
 @RequestMapping("/course-comment")
@@ -40,5 +43,11 @@ public class CourseCommentController {
     @GetMapping("/getCourseScore/{courseId}")
     public CourseScore getCourseScore(@PathVariable Long courseId) {
         return courseCommentService.getCourseScore(courseId);
+    }
+
+    @ApiOperation("批量获取课程评分")
+    @GetMapping("/getCourseScore/batch")
+    public Map<Long, CourseScore> getCourseScoreBatch(@RequestParam("courseIds") ArrayList<Long> courseIds) {
+        return courseCommentService.getCourseScoreBatch(courseIds);
     }
 }

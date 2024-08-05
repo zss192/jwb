@@ -35,4 +35,10 @@
         <result property="studyCount" column="study_count" jdbcType="BIGINT"/>
         <result property="favoriteCount" column="favorite_count" jdbcType="BIGINT"/>
     </resultMap>
+    <select id="selectByIds" resultType="com.jwb.content.model.po.CoursePublish">
+        SELECT * FROM course_publish WHERE id IN
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

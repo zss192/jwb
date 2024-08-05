@@ -23,4 +23,10 @@
         two_score,one_score,sum_score,
         people_count
     </sql>
+    <select id="selectByIds" resultType="com.jwb.content.model.po.CourseScore">
+        SELECT * FROM course_score WHERE course_id IN
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

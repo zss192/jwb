@@ -7,6 +7,9 @@ import com.jwb.content.model.dto.QueryCommentDto;
 import com.jwb.content.model.po.CourseComment;
 import com.jwb.content.model.po.CourseScore;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 /**
  * @author zss
  * @description 针对表【course_comment】的数据库操作Service
@@ -49,4 +52,12 @@ public interface CourseCommentService extends IService<CourseComment> {
     CourseScore getCourseScore(Long courseId);
 
     void updateCourseScore(Long courseId);
+
+    /**
+     * 批量获取课程评分
+     *
+     * @param courseIds 课程id列表
+     * @return 课程评分
+     */
+    Map<Long, CourseScore> getCourseScoreBatch(ArrayList<Long> courseIds);
 }

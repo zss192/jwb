@@ -39,9 +39,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -329,4 +327,18 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         }
     }
 
+    /**
+     * 批量查询课程发布信息
+     *
+     * @param courseIds 课程id集合
+     */
+    @Override
+    public Map<Long, CoursePublish> getCoursePublishBatch(ArrayList<Long> courseIds) {
+        List<CoursePublish> coursePublishList = coursePublishMapper.selectByIds(courseIds);
+        Map<Long, CoursePublish> coursePublishMap = new HashMap<>();
+        for (CoursePublish coursePublish : coursePublishList) {
+            coursePublishMap.put(coursePublish.getId(), coursePublish);
+        }
+        return coursePublishMap;
+    }
 }

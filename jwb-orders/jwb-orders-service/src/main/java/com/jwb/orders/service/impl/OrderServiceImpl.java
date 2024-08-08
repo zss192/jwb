@@ -16,6 +16,7 @@ import com.jwb.base.utils.QRCodeUtil;
 import com.jwb.messagesdk.model.po.MqMessage;
 import com.jwb.messagesdk.service.MqMessageService;
 import com.jwb.orders.config.AlipayConfig;
+import com.jwb.orders.config.MqDelayConfig;
 import com.jwb.orders.config.PayNotifyConfig;
 import com.jwb.orders.mapper.JwbOrdersGoodsMapper;
 import com.jwb.orders.mapper.JwbOrdersMapper;
@@ -128,7 +129,15 @@ public class OrderServiceImpl implements OrderService {
         if (insert <= 0) {
             JwbException.cast("插入订单记录失败");
         }
-        // 3. 插入订单明细表
+        // 3. 订单创建时，生产者发送订单延时消息
+        rabbitTemplate.convertAndSend(MqDelayConfig.EXCHANGE_NAME, MqDelayConfig.ROUTE_KEY,
+                order.getId(), message -> {
+                    message.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);  //消息持久化
+                    // 设置超时时间为30分钟，单位为ms
+                    message.getMessageProperties().setDelay(30 * 60 * 1000);
+                    return message;
+                });
+        // 4. 插入订单明细表
         Long orderId = order.getId();
         String orderDetail = addOrderDto.getOrderDetail();
         List<JwbOrdersGoods> OrdersGoodsList = JSON.parseArray(orderDetail, JwbOrdersGoods.class);

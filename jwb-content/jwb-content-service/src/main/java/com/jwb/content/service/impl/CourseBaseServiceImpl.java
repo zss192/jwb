@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jwb.base.exception.JwbException;
 import com.jwb.base.model.PageParams;
 import com.jwb.base.model.PageResult;
+import com.jwb.base.utils.BloomFilterUtil;
 import com.jwb.content.mapper.*;
 import com.jwb.content.model.dto.*;
 import com.jwb.content.model.po.CourseBase;
@@ -56,6 +57,8 @@ public class CourseBaseServiceImpl implements CourseBaseService {
     StringRedisTemplate redisTemplate;
     @Autowired
     RedissonClient redissonClient;
+    @Autowired
+    private BloomFilterUtil bloomFilterUtil;
 
     @Override
     public PageResult<CourseBase> queryCourseBaseList(Long companyId, PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
@@ -110,6 +113,8 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         Long courseId = courseBase.getId();
         courseMarket.setId(courseId);
         saveCourseMarket(courseMarket);
+        // 课程id添加到布隆过滤器
+        bloomFilterUtil.put("course_dynamic:" + courseId);
 
         return getCourseBaseInfo(courseId);
     }
@@ -245,6 +250,12 @@ public class CourseBaseServiceImpl implements CourseBaseService {
     @Override
     public CourseDynamicDto getCourseDynamicInfo(Long courseId) {
         String cacheKey = "course_dynamic:" + courseId;
+        // 先检查布隆过滤器，如果不存在，直接返回空结果
+        if (!bloomFilterUtil.mightContain(cacheKey)) {
+            log.debug("布隆过滤器中不存在");
+            return null;
+        }
+
         // 从缓存中查询
         String courseDynamicCacheJson = redisTemplate.opsForValue().get(cacheKey);
         if (StringUtils.isNotEmpty(courseDynamicCacheJson)) {
@@ -266,19 +277,17 @@ public class CourseBaseServiceImpl implements CourseBaseService {
             log.debug("缓存中没有，查询数据库");
             CourseBase courseBase = courseBaseMapper.selectById(courseId);
             CourseDynamicDto courseDynamicDto = new CourseDynamicDto();
-            if (courseBase == null) {
-                // 缓存空值防止缓存穿透
-                redisTemplate.opsForValue().set(cacheKey, "null", 5 + new Random().nextInt(10), TimeUnit.SECONDS);
-                return null;
-            } else {
-                courseDynamicDto.setStudyCount(courseBase.getStudyCount());
-                courseDynamicDto.setFavoriteCount(courseBase.getFavoriteCount());
-            }
+            courseDynamicDto.setStudyCount(courseBase.getStudyCount());
+            courseDynamicDto.setFavoriteCount(courseBase.getFavoriteCount());
 
             // 缓存查询结果
             String jsonString = JSON.toJSONString(courseDynamicDto);
             // 过期时间加上一个随机值防止缓存雪崩
             redisTemplate.opsForValue().set(cacheKey, jsonString, 900 + new Random().nextInt(100), TimeUnit.SECONDS);
+
+            // 将 key 加入布隆过滤器
+            bloomFilterUtil.put(cacheKey);
+
             return courseDynamicDto;
         } finally {
             lock.unlock();

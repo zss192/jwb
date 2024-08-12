@@ -3,6 +3,9 @@ package com.jwb.content.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jwb.content.model.po.CourseBase;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * @author zss
@@ -14,6 +17,13 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface CourseBaseMapper extends BaseMapper<CourseBase> {
 
+    /**
+     * 获取全部数据的id
+     *
+     * @return 全部数据的id
+     */
+    @Select("select id from course_base")
+    List<String> getIds();
 }
 
 

@@ -1,15 +1,19 @@
 package com.jwb.search.mq;
 
-import com.jwb.search.feignclient.ContentServiceClient;
+import com.alibaba.fastjson.JSON;
+import com.jwb.search.dto.CanalMessage;
 import com.jwb.search.po.CourseIndex;
 import com.jwb.search.po.CoursePublish;
 import com.jwb.search.service.IndexService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
 
 @Component
 @Slf4j
@@ -19,30 +23,25 @@ public class CourseListener {
 
     @Autowired
     private IndexService indexService;
-    @Autowired
-    private ContentServiceClient contentServiceClient;
 
     /**
-     * 监听课程删除业务
-     *
-     * @param id 课程的id
+     * 监听课程变化业务
      */
-    @RabbitListener(queues = "course.delete.queue")
-    public void listenHotelDeleteQueue(Long id) {
-        indexService.deleteCourseIndex(courseIndexStore, id.toString());
-    }
+    @RabbitListener(queues = "course.canal.queue")
+    public void listenCourseQueue(Message message) {
+        String msg = new String(message.getBody(), StandardCharsets.UTF_8);
+        CanalMessage canalMessage = JSON.parseObject(msg, CanalMessage.class);
 
-    /**
-     * 监听课程新增/修改业务
-     *
-     * @param id 课程的id
-     */
-    @RabbitListener(queues = "course.insert.queue")
-    public void listenHotelInsertQueue(Long id) {
-        // 根据id查询课程信息
-        CoursePublish coursePublish = contentServiceClient.getCoursePublish(id);
-        CourseIndex courseIndex = new CourseIndex();
-        BeanUtils.copyProperties(coursePublish, courseIndex);
-        indexService.addCourseIndex(courseIndexStore, id.toString(), courseIndex);
+        CoursePublish coursePublish = JSON.parseObject(String.valueOf(canalMessage.getData().get(0)), CoursePublish.class);
+        Long courseId = coursePublish.getId();
+        String type = canalMessage.getType();
+
+        if ("DELETE".equals(type)) {
+            indexService.deleteCourseIndex(courseIndexStore, courseId.toString());
+        } else if ("INSERT".equals(type) || "UPDATE".equals(type)) {
+            CourseIndex courseIndex = new CourseIndex();
+            BeanUtils.copyProperties(coursePublish, courseIndex);
+            indexService.addCourseIndex(courseIndexStore, courseId.toString(), courseIndex);
+        }
     }
 }

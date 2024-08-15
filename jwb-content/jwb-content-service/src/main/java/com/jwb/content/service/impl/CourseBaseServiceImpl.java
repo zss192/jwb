@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -51,8 +50,6 @@ public class CourseBaseServiceImpl implements CourseBaseService {
     CourseTeacherMapper courseTeacherMapper;
     @Autowired
     TeachplanMapper teachplanMapper;
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
     @Autowired
     StringRedisTemplate redisTemplate;
     @Autowired
@@ -225,10 +222,6 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         courseMarketMapper.deleteById(courseId);
         // 删除课程基本信息
         courseBaseMapper.deleteById(courseId);
-        // 如果课程已发布还要删除elasticSearch中的课程信息
-        if ("203002".equals(courseBase.getStatus())) {
-            rabbitTemplate.convertAndSend("course.topic.exchange", "course.delete", courseId);
-        }
     }
 
     @Override

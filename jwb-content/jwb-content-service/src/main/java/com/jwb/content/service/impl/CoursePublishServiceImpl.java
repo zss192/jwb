@@ -267,8 +267,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
     @Override
     public Boolean saveCourseIndex(Long courseId) {
-        // 发送消息到MQ，添加或修改课程索引
-        rabbitTemplate.convertAndSend("course.topic.exchange", "course.insert", courseId);
+        // 使用canal自动发送消息到MQ，添加或修改课程索引
         return true;
     }
 

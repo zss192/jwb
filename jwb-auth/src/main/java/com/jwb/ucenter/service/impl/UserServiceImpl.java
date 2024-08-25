@@ -193,7 +193,8 @@ public class UserServiceImpl implements UserService, AuthService {
                 authRequest = new AuthWeChatOpenRequest(AuthConfig.builder()
                         .clientId(wechat_open_id)
                         .clientSecret(wechat_open_secret)
-                        .redirectUri(redirectUrl + "wechat_open")
+                        // 这里的配置是网上找到的，所以这里必须设置成http://localhost:8160
+                        .redirectUri("http://localhost:8160/auth/oauth/callback/wechat_open")
                         .build());
                 break;
             case "google":

@@ -22,11 +22,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public void modify(ModifyDto modifyDto) {
         JwbUser jwbUser = jwbUserMapper.selectById(modifyDto.getId());
-        // 不允许更改邮箱
-        if (!jwbUser.getEmail().equals(modifyDto.getEmail())) {
-            throw new RuntimeException("不允许更改邮箱");
-        }
-        // 若更改了账号查询是否账号已存在
+        // 若更改了账号，查询是否账号已存在
         if (!jwbUser.getUsername().equals(modifyDto.getUsername())) {
             JwbUser user = jwbUserMapper.selectOne(new LambdaQueryWrapper<JwbUser>()
                     .eq(JwbUser::getUsername, modifyDto.getUsername()));

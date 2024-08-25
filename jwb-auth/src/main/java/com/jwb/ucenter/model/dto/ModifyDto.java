@@ -14,8 +14,6 @@ public class ModifyDto {
 
     String cellphone;
 
-    String email;
-
     String username;
 
     String nickname;
